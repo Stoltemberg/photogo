@@ -18,7 +18,7 @@ const questions = [
   },
   {
     q: "Qual a diferença entre os planos?",
-    a: "Free: 6% de comissão por venda. Pro (R$16,90/mês): 4,5% de comissão + badge Verified Pro + destaque em buscas. Studio (R$49,90/mês): 2% de comissão + white-label + API + SLA 99,9%.",
+    a: "Free: 6% de comissão por venda. Pro (R$16,90/mês): 4,5% de comissão + badge Verified Pro + destaque em buscas. Studio (R$49,90/mês): 2% de comissão + white-label + acesso à API REST + garantia de 99,9% de uptime.",
   },
   {
     q: "E se eu cancelar minha conta?",
@@ -44,27 +44,38 @@ export function FAQ() {
         </div>
 
         <div className="mt-12 divide-y divide-ink-900/5 dark:divide-paper-100/5">
-          {questions.map((item, idx) => (
-            <div key={item.q}>
-              <button
-                type="button"
-                onClick={() => setOpen(open === idx ? null : idx)}
-                className="flex w-full items-center justify-between gap-4 py-5 text-left transition hover:text-sunset-500"
-                aria-expanded={open === idx}
-              >
-                <span className="font-mono text-lg font-medium">{item.q}</span>
-                <ChevronDown
-                  className={`h-5 w-5 flex-shrink-0 transition-transform ${
-                    open === idx ? "rotate-180 text-sunset-500" : ""
+          {questions.map((item, idx) => {
+            const isOpen = open === idx;
+            return (
+              <div key={item.q}>
+                <button
+                  type="button"
+                  onClick={() => setOpen(isOpen ? null : idx)}
+                  className="flex w-full items-center justify-between gap-4 py-5 text-left transition hover:text-sunset-500"
+                  aria-expanded={isOpen}
+                >
+                  <span className="font-mono text-lg font-medium">{item.q}</span>
+                  <ChevronDown
+                    className={`h-5 w-5 flex-shrink-0 transition-transform duration-300 ease-out ${
+                      isOpen ? "rotate-180 text-sunset-500" : ""
+                    }`}
+                    strokeWidth={1.75}
+                  />
+                </button>
+                <div
+                  className={`grid transition-all duration-300 ease-out ${
+                    isOpen
+                      ? "grid-rows-[1fr] opacity-100"
+                      : "grid-rows-[0fr] opacity-0"
                   }`}
-                  strokeWidth={1.75}
-                />
-              </button>
-              {open === idx && (
-                <p className="pb-5 text-ink-600 dark:text-paper-200">{item.a}</p>
-              )}
-            </div>
-          ))}
+                >
+                  <div className="overflow-hidden">
+                    <p className="pb-5 text-ink-600 dark:text-paper-200">{item.a}</p>
+                  </div>
+                </div>
+              </div>
+            );
+          })}
         </div>
       </div>
     </section>
