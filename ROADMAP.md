@@ -848,12 +848,12 @@ Cobertura mínima aceita: **85%** (core + photogo).
 
 ## 🚧 Decisões Abertas
 
-1. **Pessoa Física vs PJ:** Apenas PJ para fotógrafos (com CNPJ) ou aceita PF com limite de saque?
-2. **Curadoria:** Todos os fotógrafos aprovados ou com curadoria manual?
-3. **Sub-mercado:** Nacional (BR) primeiro ou multi-mercado desde o início?
-4. **Open Source:** Tornar PhotoGo open-source também ou manter fork proprietário?
-5. **Mobile App:** React Native ou Flutter? (Spree SDK é TS-only)
-6. **Blockchain:** Realmente vale a pena? Talvez só "Provenance Badge" opcional.
+1. **Pessoa Física vs PJ:** ✅ RESOLVIDO — Ambos aceitos. PF (CPF/MEI) e PJ (CNPJ) podem entrar; para vendas acima de R$ 32k/ano, recomendamos CNPJ.
+2. **Curadoria:** ⚪ Em aberto — sugestão: sem curadoria no início (self-approve automático), introduzir curadoria manual após R$ 1k de vendas acumuladas.
+3. **Sub-mercado:** ✅ RESOLVIDO — Brasil primeiro (BRL, PT-BR). Expansão multi-mercado fica para depois do product-market fit.
+4. **Open Source:** ✅ RESOLVIDO — Fork proprietário (código fechado). Não open-source. Upstream spree/spree pode receber contribuições de melhorias genéricas, mas o PhotoGo fica privado.
+5. **Mobile App:** ✅ RESOLVIDO — **React Native + Expo**. Reusa o `packages/sdk` TypeScript (zero rewrite de clientes API). Expo EAS permite OTA updates sem renovar loja — crucial para marketplace que itera rápido.
+6. **Blockchain / Provenance Badge:** ⚪ Postergado — Provenance Badge ("Selo de Procedência") implementa como **hash SHA-256 do arquivo + EXIF + timestamp + ID do fotógrafo**, registrado no banco de dados (sem blockchain) na Fase 3. A gravação on-chain (Polygon PoS) fica como diferencial premium backlog/post-MVP, não bloqueia o MVP.
 
 ---
 
