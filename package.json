@@ -1,10 +1,14 @@
 {
-  "name": "spree",
+  "name": "photogo",
+  "version": "0.1.0",
   "private": true,
+  "description": "PhotoGo — marketplace fotográfico construído sobre Spree Commerce 6.0",
   "scripts": {
     "preinstall": "npx only-allow pnpm",
     "dev": "turbo dev",
+    "dev:landing": "pnpm --filter @photogo/landing dev",
     "build": "turbo build",
+    "build:landing": "pnpm --filter @photogo/landing build",
     "test": "turbo test",
     "lint": "turbo lint",
     "lint:fix": "turbo lint:fix",

@@ -1,0 +1,16 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "buildCommand": "cd apps/landing-photogo && pnpm install --ignore-workspace --prod=false && pnpm build",
+  "framework": "nextjs",
+  "git": {
+    "deploymentEnabled": {
+      "main": true,
+      "local/integration": true
+    }
+  },
+  "github": {
+    "silent": false
+  },
+  "outputDirectory": "apps/landing-photogo/.next",
+  "trailingSlash": false
+}
