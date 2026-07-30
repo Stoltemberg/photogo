@@ -301,19 +301,37 @@ end
 ## 🟢 FASE 3 — Entrega Digital & Licenciamento (2-3 semanas)
 
 ### Objetivos
-Entrega segura de fotos digitais, licenciamento, certificados de autenticidade.
+Entrega segura de fotos digitais e seus respectivos certificados de licença.
 
 ### Entregáveis
-- [ ] Gerador de links S3 pré-assinados (Spatie Laravel-style signed URLs)
+- [ ] Gerador de links S3 pré-assinados para download da **foto original** (24h, 3 downloads)
 - [ ] Limite de downloads + expiração configurável por fotógrafo
 - [ ] Watermark com nome do comprador (burn-in) opcional para licenças
-- [ ] Gerador de certificados PDF de licença (hash de autenticidade)
+- [ ] Gerador de **Certificado de Licença em PDF** (com hash SHA-256 de autenticidade)
 - [ ] Integração opcional com blockchain (Polygon) para prova de origem
 - [ ] Email delivery com link único (template `Spree::PhotoDeliveryMailer`)
 - [ ] Customer dashboard: minhas compras, downloads restantes, links expirados
 - [ ] Anti-pirataria: rate limiting, fingerprinting básico, DMCA takedown flow
 
 ### Modelo de Entrega Digital
+
+Após pagamento confirmado, o cliente recebe **dois artefatos separados**:
+
+1. **A foto original** (arquivo do fotógrafo)
+   - Formato: JPEG, TIFF ou RAW (conforme o fotógrafo oferecer)
+   - Resolução: 100% da original, sem watermark, sem compressão extra
+   - Entrega: link S3 pré-assinado, válido 24h, máximo 3 downloads
+   - O cliente baixa e usa (wallpaper, impressão própria, projeto comercial conforme licença)
+
+2. **O Certificado de Licença** (PDF gerado dinamicamente)
+   - Conteúdo: preview da foto (baixa-res), nome da foto, fotógrafo,
+     tipo de licença (personal / commercial / editorial / exclusive / extended),
+     território, prazo de uso, data de compra, hash SHA-256 de autenticidade
+   - Formato: PDF/A (padrão arquivamento de longo prazo)
+   - Tamanho: ~200-500KB
+   - Funcão: prova de licença — o cliente apresenta este PDF para auditoria,
+     agência, cliente final. Contém QR code opcional para verificação online.
+
 ```ruby
 # app/models/photo/digital_delivery.rb
 class Photo::DigitalDelivery < Spree.base_class
