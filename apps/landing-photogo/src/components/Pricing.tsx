@@ -43,7 +43,7 @@ const plans = [
     features: [
       "Comissão de 2%",
       "White-label opcional",
-      "Acesso à API REST (integre com seu CMS, ERP, app)",
+      "Acesso à API",
       "Onboarding dedicado",
       "Garantia de 99,9% de uptime mensal",
       "Suporte via telefone",
