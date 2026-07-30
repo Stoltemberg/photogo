@@ -441,6 +441,10 @@ module Spree
           Rails.configuration.cache_classes ? require(c) : load(c)
         end
 
+        # Load VendorConcern so core models can include it via
+        # `if defined?(Spree::VendorConcern)` hooks.
+        Spree::VendorConcern # touch autoload path
+
         # Reset and re-activate event subscribers on code reload
         # activate! will register all subscribers from Spree.subscribers
         # Note: resolve_subscriber in register_subscribers! handles stale class references

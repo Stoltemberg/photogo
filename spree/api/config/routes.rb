@@ -102,6 +102,12 @@ Spree::Core::Engine.add_routes do
 
         # Data Feeds (public, no auth required)
         resources :feeds, only: [:show], controller: 'data_feeds', param: :slug
+
+        # Vendors (public profiles — approved only, no auth)
+        resources :vendors, only: [:index, :show], param: :slug, controller: 'vendors'
+
+        # Vendor Applications (self-serve "become a seller", no auth, rate-limited)
+        resources :vendor_applications, only: [:create], controller: 'vendors'
       end
 
       namespace :admin do
@@ -390,6 +396,19 @@ Spree::Core::Engine.add_routes do
           resources :adjustments, controller: 'orders/adjustments', only: [:index, :show]
           resources :gift_cards, controller: 'orders/gift_cards', only: [:create, :destroy]
           resource :store_credits, controller: 'orders/store_credits', only: [:create, :destroy]
+        end
+
+        # Vendors (photographers / marketplace sellers)
+        resources :vendors, only: [:index, :show, :create, :update, :destroy] do
+          member do
+            post :approve
+            post :reject
+            post :suspend
+          end
+          collection do
+            get :payouts
+            get :transfers
+          end
         end
       end
 
