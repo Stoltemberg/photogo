@@ -97,7 +97,7 @@ export function Footer() {
         </div>
 
         <div className="mt-12 flex flex-col items-center justify-between gap-4 border-t border-ink-900/5 pt-8 text-xs text-ink-600 dark:border-paper-100/5 dark:text-paper-300 sm:flex-row">
-          <p>© {new Date().getFullYear()} PhotoGo. Construído sobre Spree Commerce 6.0 (BSD-3-Clause).</p>
+          <p>© {new Date().getFullYear()} PhotoGo. Todos os direitos reservados.</p>
           <p className="font-mono">
             Made with <span className="text-sunset-500">♥</span> in Brazil
           </p>

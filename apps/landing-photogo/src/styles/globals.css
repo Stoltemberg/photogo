@@ -24,6 +24,48 @@
   }
 }
 
+/* ─────────────────────────────────────────────────────
+   Dark / Light theme transition — smooth color shift
+   Applies to every element when .dark is toggled on <html>.
+   View Transitions API paints first frame on top of old,
+   so the cross-fade looks native in Chromium browsers.
+   ───────────────────────────────────────────────────── */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 350ms;
+  animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  /* Smooth transition for every color-bearing property when the theme flips */
+  html.dark,
+  html.dark body,
+  html.dark .bg-paper-50,
+  html.dark .bg-paper-100,
+  html.dark .bg-ink-900,
+  html.dark .bg-ink-950,
+  html.dark .text-ink-900,
+  html.dark .text-ink-600,
+  html.dark .text-paper-100,
+  html.dark .text-paper-200,
+  html.dark .border-ink-900\/5,
+  html.dark .border-paper-100\/5,
+  html:not(.dark) .bg-paper-50,
+  html:not(.dark) .bg-paper-100,
+  html:not(.dark) .bg-ink-900,
+  html:not(.dark) .bg-ink-950,
+  html:not(.dark) .text-ink-900,
+  html:not(.dark) .text-ink-600,
+  html:not(.dark) .text-paper-100,
+  html:not(.dark) .text-paper-200,
+  html:not(.dark) .border-ink-900\/5,
+  html:not(.dark) .border-paper-100\/5 {
+    transition: background-color 350ms cubic-bezier(0.4, 0, 0.2, 1),
+      color 350ms cubic-bezier(0.4, 0, 0.2, 1),
+      border-color 350ms cubic-bezier(0.4, 0, 0.2, 1);
+  }
+}
+
 @layer components {
   .container-narrow {
     @apply mx-auto w-full max-w-6xl px-6 sm:px-8;

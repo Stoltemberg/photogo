@@ -83,7 +83,7 @@ export function Features() {
             <span className="text-sunset-500">precisa para vender</span>
           </h2>
           <p className="mt-4 text-pretty text-lg text-ink-600 dark:text-paper-200">
-            Construído sobre Spree Commerce 6.0 — open-source, self-hosted, sem royalties.
+            Da primeira foto ao payout — tudo otimizado para você vender mais.
           </p>
         </div>
 

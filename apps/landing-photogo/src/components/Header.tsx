@@ -34,8 +34,19 @@ export function Header() {
     const next = theme === "dark" ? "light" : "dark";
     setTheme(next);
     localStorage.setItem("photogo-theme", next);
-    document.documentElement.classList.toggle("dark", next === "dark");
-    document.documentElement.style.colorScheme = next;
+
+    // Use the View Transitions API for a smooth cross-fade when available.
+    // Falls back to the CSS transitions defined in globals.css otherwise.
+    const toggle = () => {
+      document.documentElement.classList.toggle("dark", next === "dark");
+      document.documentElement.style.colorScheme = next;
+    };
+
+    if (typeof document.startViewTransition === "function") {
+      document.startViewTransition(toggle);
+    } else {
+      toggle();
+    }
   }
 
   return (

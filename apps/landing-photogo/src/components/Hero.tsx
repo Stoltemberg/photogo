@@ -1,4 +1,4 @@
-import { ArrowRight, Camera, Sparkles } from "lucide-react";
+import { ArrowRight, Camera } from "lucide-react";
 
 const heroPhotos = [
   { src: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&q=80", alt: "Montanha ao amanhecer", category: "Paisagem" },
@@ -24,11 +24,6 @@ export function Hero() {
 
       <div className="container-wide">
         <div className="mx-auto max-w-3xl text-center">
-          <span className="badge mb-6">
-            <Sparkles className="h-3 w-3 text-sunset-500" />
-            Construído sobre Spree Commerce 6.0
-          </span>
-
           <h1 className="text-balance font-mono text-5xl font-semibold leading-[1.05] tracking-tight sm:text-6xl lg:text-7xl">
             O marketplace
             <br />

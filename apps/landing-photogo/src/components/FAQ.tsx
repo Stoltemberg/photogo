@@ -18,7 +18,7 @@ const questions = [
   },
   {
     q: "Qual a diferença entre os planos?",
-    a: "Free: 20% de comissão. Pro (R$49/mês): 10% de comissão + badge Verified Pro. Studio (R$199/mês): 0% de comissão + white-label.",
+    a: "Free: 6% de comissão por venda. Pro (R$16,90/mês): 4,5% de comissão + badge Verified Pro + destaque em buscas. Studio (R$49,90/mês): 2% de comissão + white-label + API + SLA 99,9%.",
   },
   {
     q: "E se eu cancelar minha conta?",
