@@ -432,6 +432,15 @@ Spree::Core::Engine.add_routes do
             post :revoke
           end
         end
+
+        # Photo Payouts (admin management)
+        resources :payouts, only: [:index, :show] do
+          member do
+            post :process
+            post :mark_paid
+            post :mark_failed
+          end
+        end
       end
 
       # Webhooks (outside of store namespace — no API key authentication)
