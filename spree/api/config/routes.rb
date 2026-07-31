@@ -114,7 +114,7 @@ Spree::Core::Engine.add_routes do
 
         # Store checkout endpoint (creates order, generates commissions)
         post 'checkout', to: 'checkout#create', as: :checkout
-
+      end
 
       namespace :admin do
         # Mounts a nested `custom_fields` resource on parents that include
