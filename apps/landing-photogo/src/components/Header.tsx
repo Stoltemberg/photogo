@@ -1,6 +1,7 @@
 "use client";
 
 import { Camera, Menu, Moon, Sun, X } from "lucide-react";
+import Link from "next/link";
 import { useEffect, useState } from "react";
 
 const navLinks = [
@@ -92,6 +93,10 @@ export function Header() {
           <a href="#early-access" className="hidden btn-primary md:inline-flex">
             Acesso Antecipado
           </a>
+
+          <Link href="/auth/login" className="hidden md:inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm text-ink-600 transition hover:text-ink-900 dark:text-paper-200 dark:hover:text-paper-50">
+            Entrar
+          </Link>
 
           <button
             type="button"
