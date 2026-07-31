@@ -447,6 +447,7 @@ Spree::Core::Engine.add_routes do
       namespace :webhooks do
         post 'payments/:payment_method_id', to: 'payments#create', as: :payment_webhook
         post 'mercado_pago',               to: 'mercado_pago#create', as: :mercado_pago_webhook
+        post 'supabase',                   to: 'supabase#create', as: :supabase_webhook
       end
     end
   end
