@@ -39,9 +39,11 @@ export function CTA() {
         setStatus('error');
         setMessage(data.error || 'Erro ao inscrever');
       }
-    } catch {
+    } catch (err) {
       setStatus('error');
-      setMessage('Erro de conexão. Tente novamente.');
+      const errMsg = err instanceof Error ? err.message : String(err);
+      setMessage(`Erro: ${errMsg}`);
+      console.error('[CTA] fetch error:', err);
     }
   };
 
