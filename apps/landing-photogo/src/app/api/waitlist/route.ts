@@ -8,7 +8,7 @@ export async function POST(request: NextRequest) {
     if (!email || typeof email !== 'string') {
       return NextResponse.json(
         { error: 'Email é obrigatório' },
-        { status: 400 }
+        { status: 400, headers: corsHeaders }
       )
     }
 
@@ -17,7 +17,7 @@ export async function POST(request: NextRequest) {
     if (!emailRegex.test(email)) {
       return NextResponse.json(
         { error: 'Email inválido' },
-        { status: 400 }
+        { status: 400, headers: corsHeaders }
       )
     }
 
@@ -29,22 +29,29 @@ export async function POST(request: NextRequest) {
     
     console.log('[Waitlist] New signup:', email)
     
-    // TODO: Integrate with Spree backend
-    // await fetch(`${process.env.SPREE_API_URL}/api/v3/store/waitlist`, {
-    //   method: 'POST',
-    //   headers: { 'Content-Type': 'application/json' },
-    //   body: JSON.stringify({ email })
-    // })
-
     return NextResponse.json(
       { message: 'Inscrito com sucesso! Em breve entraremos em contato.', email },
-      { status: 201 }
+      { status: 201, headers: corsHeaders }
     )
   } catch (error) {
     console.error('[Waitlist] Error:', error)
     return NextResponse.json(
       { error: 'Erro interno do servidor' },
-      { status: 500 }
+      { status: 500, headers: corsHeaders }
     )
   }
+}
+
+// Handle preflight OPTIONS request
+export async function OPTIONS() {
+  return new NextResponse(null, {
+    status: 204,
+    headers: corsHeaders
+  })
+}
+
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Methods': 'POST, OPTIONS',
+  'Access-Control-Allow-Headers': 'Content-Type',
 }
