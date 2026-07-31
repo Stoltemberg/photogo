@@ -7,7 +7,7 @@ module Photo
   class PhotographerProfile < Spree.base_class
     has_prefix_id :photog
 
-    belongs_to :vendor, class_name: 'Spree::Vendor'
+    belongs_to :vendor, class_name: 'Spree::Vendor', inverse_of: :photographer_profile
 
     # Portfolio
     has_one_attached :cover_photo

@@ -108,6 +108,9 @@ Spree::Core::Engine.add_routes do
 
         # Vendor Applications (self-serve "become a seller", no auth, rate-limited)
         resources :vendor_applications, only: [:create], controller: 'vendors'
+
+        # Photographers (public profiles with photo-specific data)
+        resources :photographers, only: [:index, :show], param: :slug, controller: 'photographers'
       end
 
       namespace :admin do
@@ -408,6 +411,14 @@ Spree::Core::Engine.add_routes do
           collection do
             get :payouts
             get :transfers
+          end
+        end
+
+        # Photographers (photo-specific profiles extending vendors)
+        resources :photographers, only: [:index, :show, :update] do
+          member do
+            post :verify
+            post :feature
           end
         end
       end
