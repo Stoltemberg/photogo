@@ -111,6 +111,11 @@ Spree::Core::Engine.add_routes do
 
         # Photographers (public profiles with photo-specific data)
         resources :photographers, only: [:index, :show], param: :slug, controller: 'photographers'
+
+        # Photo Downloads (token-gated, rate-limited)
+        get  'downloads/:token', to: 'downloads#show',  as: :download_link
+        post 'downloads/:token', to: 'downloads#claim', as: :claim_download
+        get  'downloads',       to: 'downloads#index',  as: :downloads
       end
 
       namespace :admin do
@@ -419,6 +424,14 @@ Spree::Core::Engine.add_routes do
           member do
             post :verify
             post :feature
+          end
+        end
+
+        # Photo Licenses (admin management)
+        resources :licenses, only: [:index, :show, :create, :update] do
+          member do
+            post :issue_certificate
+            post :revoke
           end
         end
       end
