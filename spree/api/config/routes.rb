@@ -112,11 +112,9 @@ Spree::Core::Engine.add_routes do
         # Photographers (public profiles with photo-specific data)
         resources :photographers, only: [:index, :show], param: :slug, controller: 'photographers'
 
-        # Photo Downloads (token-gated, rate-limited)
-        get  'downloads/:token', to: 'downloads#show',  as: :download_link
-        post 'downloads/:token', to: 'downloads#claim', as: :claim_download
-        get  'downloads',       to: 'downloads#index',  as: :downloads
-      end
+        # Store checkout endpoint (creates order, generates commissions)
+        post 'checkout', to: 'checkout#create', as: :checkout
+
 
       namespace :admin do
         # Mounts a nested `custom_fields` resource on parents that include
