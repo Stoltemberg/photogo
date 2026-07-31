@@ -18,6 +18,7 @@ platforms :ruby do
 end
 
 gem 'meilisearch', '>= 0.28'
+gem 'mercadopago-sdk-ruby', '~> 2.5'
 
 group :test do
   gem 'parallel_tests'
