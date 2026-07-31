@@ -10,7 +10,8 @@ export function CTA() {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const formData = new FormData(e.currentTarget);
+    const form = e.currentTarget;
+    const formData = new FormData(form);
     const email = formData.get('email') as string;
     
     if (!email || !email.includes('@')) {
@@ -34,7 +35,7 @@ export function CTA() {
       if (res.ok) {
         setStatus('success');
         setMessage(data.message || 'Inscrito com sucesso!');
-        e.currentTarget.reset();
+        form.reset(); // Use form ref directly, not e.currentTarget
       } else {
         setStatus('error');
         setMessage(data.error || 'Erro ao inscrever');
