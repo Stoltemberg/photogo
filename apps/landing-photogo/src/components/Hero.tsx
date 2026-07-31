@@ -1,7 +1,4 @@
-"use client";
-
 import { ArrowRight, Camera } from "lucide-react";
-import { useEffect, useState } from "react";
 
 const heroPhotos = [
   { src: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&q=80", alt: "Montanha ao amanhecer", category: "Paisagem" },
@@ -11,45 +8,6 @@ const heroPhotos = [
   { src: "https://images.unsplash.com/photo-1518791841217-8f162f1e1131?w=800&q=80", alt: "Gato", category: "Animais" },
   { src: "https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=800&q=80", alt: "Cidade à noite", category: "Urbana" },
 ];
-
-function HeroPhoto({ photo, idx }: { photo: typeof heroPhotos[number]; idx: number }) {
-  const [skeletonVisible, setSkeletonVisible] = useState(true);
-
-  // Safety net: hide skeleton after 4s regardless of onLoad
-  useEffect(() => {
-    const timer = setTimeout(() => setSkeletonVisible(false), 4000);
-    return () => clearTimeout(timer);
-  }, []);
-
-  return (
-    <div
-      className={`group relative overflow-hidden rounded-2xl bg-ink-800 shadow-xl ring-1 ring-ink-900/5 transition hover:shadow-2xl dark:ring-paper-100/5 ${
-        idx === 0 ? "row-span-2" : idx === 3 ? "row-span-2" : ""
-      }`}
-    >
-      {/* Skeleton — visible until image loads or 4s timeout */}
-      {skeletonVisible && (
-        <div
-          aria-hidden
-          className="skeleton absolute inset-0 z-10 pointer-events-none"
-        />
-      )}
-      {/* Image is ALWAYS visible — no opacity:0 gate. Skeleton overlays on top while loading. */}
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img
-        src={photo.src}
-        alt={photo.alt}
-        loading="lazy"
-        className="relative h-full w-full object-cover transition duration-700 group-hover:scale-105"
-        onLoad={() => setSkeletonVisible(false)}
-        onError={() => setSkeletonVisible(false)}
-      />
-      <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/60 to-transparent p-4 opacity-0 transition duration-300 group-hover:opacity-100">
-        <span className="text-xs font-medium text-white">{photo.category}</span>
-      </div>
-    </div>
-  );
-}
 
 export function Hero() {
   return (
@@ -112,11 +70,27 @@ export function Hero() {
           </div>
         </div>
 
-        {/* Photo gallery preview */}
+        {/* Photo gallery preview — plain img, no skeleton, no opacity gating */}
         <div className="relative mt-20 sm:mt-28">
           <div className="grid-masonry grid gap-4">
             {heroPhotos.map((photo, idx) => (
-              <HeroPhoto key={photo.src} photo={photo} idx={idx} />
+              <div
+                key={photo.src}
+                className={`group relative overflow-hidden rounded-2xl bg-ink-800 shadow-xl ring-1 ring-ink-900/5 transition hover:shadow-2xl dark:ring-paper-100/5 ${
+                  idx === 0 ? "row-span-2" : idx === 3 ? "row-span-2" : ""
+                }`}
+              >
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={photo.src}
+                  alt={photo.alt}
+                  loading="lazy"
+                  className="h-full w-full object-cover transition duration-700 group-hover:scale-105"
+                />
+                <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/60 to-transparent p-4 opacity-0 transition duration-300 group-hover:opacity-100">
+                  <span className="text-xs font-medium text-white">{photo.category}</span>
+                </div>
+              </div>
             ))}
           </div>
         </div>
