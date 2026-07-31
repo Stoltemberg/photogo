@@ -13,28 +13,36 @@ const heroPhotos = [
 ];
 
 function HeroPhoto({ photo, idx }: { photo: typeof heroPhotos[number]; idx: number }) {
-  const [loaded, setLoaded] = useState(false);
+  const [skeletonVisible, setSkeletonVisible] = useState(true);
+
+  // Safety net: hide skeleton after 4s regardless of onLoad
+  useEffect(() => {
+    const timer = setTimeout(() => setSkeletonVisible(false), 4000);
+    return () => clearTimeout(timer);
+  }, []);
 
   return (
     <div
-      className={`group relative overflow-hidden rounded-2xl bg-ink-900 shadow-xl ring-1 ring-ink-900/5 transition hover:shadow-2xl dark:ring-paper-100/5 ${
+      className={`group relative overflow-hidden rounded-2xl bg-ink-800 shadow-xl ring-1 ring-ink-900/5 transition hover:shadow-2xl dark:ring-paper-100/5 ${
         idx === 0 ? "row-span-2" : idx === 3 ? "row-span-2" : ""
       }`}
     >
-      {/* Skeleton placeholder — visible until image loads */}
-      {!loaded && (
-        <div aria-hidden className="skeleton absolute inset-0" />
+      {/* Skeleton — visible until image loads or 4s timeout */}
+      {skeletonVisible && (
+        <div
+          aria-hidden
+          className="skeleton absolute inset-0 z-10 pointer-events-none"
+        />
       )}
+      {/* Image is ALWAYS visible — no opacity:0 gate. Skeleton overlays on top while loading. */}
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         src={photo.src}
         alt={photo.alt}
         loading="lazy"
-        className={`relative h-full w-full object-cover transition duration-700 group-hover:scale-105 ${
-          loaded ? "opacity-100" : "opacity-0"
-        }`}
-        onLoad={() => setLoaded(true)}
-        onError={() => setLoaded(true)}
+        className="relative h-full w-full object-cover transition duration-700 group-hover:scale-105"
+        onLoad={() => setSkeletonVisible(false)}
+        onError={() => setSkeletonVisible(false)}
       />
       <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/60 to-transparent p-4 opacity-0 transition duration-300 group-hover:opacity-100">
         <span className="text-xs font-medium text-white">{photo.category}</span>
