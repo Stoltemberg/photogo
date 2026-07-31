@@ -7,6 +7,8 @@ import { Hero } from "@/components/Hero";
 import { HowItWorks } from "@/components/HowItWorks";
 import { Pricing } from "@/components/Pricing";
 
+export const revalidate = 0; // Force re-render on every request (ISR off)
+
 export default function HomePage() {
   return (
     <>
