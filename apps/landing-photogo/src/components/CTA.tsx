@@ -1,7 +1,50 @@
-import { ArrowRight, Check } from "lucide-react";
+"use client";
+
+import { ArrowRight, Check, Loader2 } from "lucide-react";
 import { FadeInSection } from "./FadeInSection";
+import { useState } from "react";
 
 export function CTA() {
+  const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
+  const [message, setMessage] = useState('');
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const formData = new FormData(e.currentTarget);
+    const email = formData.get('email') as string;
+    
+    if (!email || !email.includes('@')) {
+      setStatus('error');
+      setMessage('Digite um email válido');
+      return;
+    }
+
+    setStatus('loading');
+    setMessage('');
+
+    try {
+      const res = await fetch('/api/waitlist', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email }),
+      });
+
+      const data = await res.json();
+
+      if (res.ok) {
+        setStatus('success');
+        setMessage(data.message || 'Inscrito com sucesso!');
+        e.currentTarget.reset();
+      } else {
+        setStatus('error');
+        setMessage(data.error || 'Erro ao inscrever');
+      }
+    } catch {
+      setStatus('error');
+      setMessage('Erro de conexão. Tente novamente.');
+    }
+  };
+
   return (
     <section id="early-access" className="border-t border-ink-900/5 py-20 dark:border-paper-100/5 sm:py-32">
       <div className="container-narrow">
@@ -24,18 +67,46 @@ export function CTA() {
                 Estamos abrindo para os primeiros 100 fotógrafos. Acesso antecipado comissões reduzidas.
               </p>
 
-              <form className="mx-auto mt-10 flex max-w-md flex-col gap-3 sm:flex-row">
+              <form onSubmit={handleSubmit} className="mx-auto mt-10 flex max-w-md flex-col gap-3 sm:flex-row">
                 <input
+                  name="email"
                   type="email"
                   required
                   placeholder="seu@email.com"
-                  className="w-full rounded-full border border-paper-100/10 bg-ink-700 px-5 py-3 text-sm text-paper-50 placeholder:text-paper-300 transition focus:border-sunset-500 focus:outline-none focus:ring-2 focus:ring-sunset-500/40"
+                  disabled={status === 'loading'}
+                  className="w-full rounded-full border border-paper-100/10 bg-ink-700 px-5 py-3 text-sm text-paper-50 placeholder:text-paper-300 transition focus:border-sunset-500 focus:outline-none focus:ring-2 focus:ring-sunset-500/40 disabled:opacity-50"
                 />
-                <button type="submit" className="btn-primary shrink-0">
-                  Quero entrar
-                  <ArrowRight className="h-4 w-4" strokeWidth={2} />
+                <button 
+                  type="submit" 
+                  disabled={status === 'loading'}
+                  className="btn-primary shrink-0 flex items-center justify-center gap-2"
+                >
+                  {status === 'loading' ? (
+                    <>
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                      <span>Inscrevendo...</span>
+                    </>
+                  ) : status === 'success' ? (
+                    <>
+                      <Check className="h-4 w-4" strokeWidth={2} />
+                      <span>Inscrito!</span>
+                    </>
+                  ) : (
+                    <>
+                      Quero entrar
+                      <ArrowRight className="h-4 w-4" strokeWidth={2} />
+                    </>
+                  )}
                 </button>
               </form>
+
+              {message && (
+                <p className={`mt-4 text-center text-sm ${
+                  status === 'error' ? 'text-red-400' : 'text-green-400'
+                }`}>
+                  {message}
+                </p>
+              )}
 
               <ul className="mt-8 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-sm text-paper-200">
                 <li className="flex items-center gap-1.5">
