@@ -54,7 +54,7 @@ module Spree
     validates :status, inclusion: { in: %w[pending invited onboarding ready_for_review approved rejected suspended canceled] }
     validates :payouts_schedule_interval, inclusion: { in: %w[daily weekly biweekly monthly manual], allow_nil: true }
     validates :tax_type, inclusion: { in: %w[pf pj mei], allow_nil: true }
-    validates :payout_provider, inclusion: { in: %w[system stripe_connect] }
+    validates :payout_provider, inclusion: { in: %w[system stripe_connect mercado_pago] }
 
     # ──────────────── Scopes ────────────────
     scope :approved,    -> { where(status: 'approved') }
