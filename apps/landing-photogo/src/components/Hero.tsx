@@ -1,3 +1,5 @@
+"use client";
+
 import { ArrowRight, Camera } from "lucide-react";
 
 const heroPhotos = [
@@ -24,17 +26,26 @@ export function Hero() {
 
       <div className="container-wide">
         <div className="mx-auto max-w-3xl text-center">
-          <h1 className="text-balance font-mono text-5xl font-semibold leading-[1.05] tracking-tight sm:text-6xl lg:text-7xl">
+          {/* Badge with blur-in entry */}
+          <div className="animate-blur-in inline-flex items-center gap-1.5 rounded-full border border-ink-900/10 bg-paper-50/50 px-3 py-1 text-xs font-medium text-ink-900 backdrop-blur dark:border-paper-100/10 dark:bg-ink-900/50 dark:text-paper-100">
+            <span className="relative flex h-1.5 w-1.5">
+              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-green-500 opacity-60" />
+              <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-green-500" />
+            </span>
+            Acesso antecipado aberto
+          </div>
+
+          <h1 className="animate-fade-in-up mt-6 text-balance font-mono text-5xl font-semibold leading-[1.05] tracking-tight sm:text-6xl lg:text-7xl">
             O marketplace
             <br />
             <span className="text-sunset-500">dos fotógrafos</span>
           </h1>
 
-          <p className="mx-auto mt-6 max-w-2xl text-balance text-lg text-ink-600 dark:text-paper-200 sm:text-xl">
+          <p className="animate-fade-in-up mx-auto mt-6 max-w-2xl text-balance text-lg text-ink-600 dark:text-paper-200 sm:text-xl" style={{ animationDelay: "120ms" }}>
             Venda fotos digitais, impressas e licenciadas. Receba repasses automáticos via Stripe Connect. Sem lidar com gateways, sem dor de cabeça com licenças.
           </p>
 
-          <div className="mt-10 flex flex-col items-center justify-center gap-3 sm:flex-row">
+          <div className="animate-fade-in-up mt-10 flex flex-col items-center justify-center gap-3 sm:flex-row" style={{ animationDelay: "240ms" }}>
             <a href="#early-access" className="btn-primary">
               Quero vender minhas fotos
               <ArrowRight className="h-4 w-4" strokeWidth={2} />
@@ -45,7 +56,7 @@ export function Hero() {
             </a>
           </div>
 
-          <div className="mt-12 flex flex-wrap items-center justify-center gap-6 text-xs text-ink-600 dark:text-paper-300">
+          <div className="animate-fade-in mt-12 flex flex-wrap items-center justify-center gap-6 text-xs text-ink-600 dark:text-paper-300" style={{ animationDelay: "360ms" }}>
             <div className="flex items-center gap-1.5">
               <div className="h-1.5 w-1.5 rounded-full bg-green-500" />
               Sem mensalidade para começar
@@ -61,24 +72,35 @@ export function Hero() {
           </div>
         </div>
 
-        {/* Photo gallery preview */}
+        {/* Photo gallery preview with staggered scale-in */}
         <div className="relative mt-20 sm:mt-28">
           <div className="grid-masonry grid gap-4">
             {heroPhotos.map((photo, idx) => (
               <div
                 key={photo.src}
-                className={`group relative overflow-hidden rounded-2xl bg-ink-900 shadow-xl ring-1 ring-ink-900/5 transition hover:shadow-2xl dark:ring-paper-100/5 ${
+                className={`animate-scale-in group relative overflow-hidden rounded-2xl bg-ink-900 shadow-xl ring-1 ring-ink-900/5 transition hover:shadow-2xl dark:ring-paper-100/5 ${
                   idx === 0 ? "row-span-2" : idx === 3 ? "row-span-2" : ""
                 }`}
+                style={{ animationDelay: `${400 + idx * 120}ms` }}
               >
+                {/* Skeleton placeholder */}
+                <div
+                  aria-hidden
+                  className="skeleton absolute inset-0"
+                />
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={photo.src}
                   alt={photo.alt}
                   loading="lazy"
-                  className="h-full w-full object-cover transition duration-700 group-hover:scale-105"
+                  className="img-fade-in relative h-full w-full object-cover transition duration-700 group-hover:scale-105"
+                  onLoad={(e) => {
+                    (e.currentTarget as HTMLImageElement).classList.add("is-loaded");
+                    const skeleton = (e.currentTarget.previousElementSibling as HTMLElement | null);
+                    if (skeleton) skeleton.style.opacity = "0";
+                  }}
                 />
-                <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/60 to-transparent p-4 opacity-0 transition group-hover:opacity-100">
+                <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/60 to-transparent p-4 opacity-0 transition duration-300 group-hover:opacity-100">
                   <span className="text-xs font-medium text-white">{photo.category}</span>
                 </div>
               </div>

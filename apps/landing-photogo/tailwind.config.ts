@@ -39,21 +39,56 @@ const config: Config = {
       },
       animation: {
         "fade-in": "fadeIn 0.6s ease-out",
+        "fade-in-up": "fadeInUp 0.7s cubic-bezier(0.16, 1, 0.3, 1) both",
+        "fade-in-down": "fadeInDown 0.7s cubic-bezier(0.16, 1, 0.3, 1) both",
         "slide-up": "slideUp 0.6s ease-out",
+        "scale-in": "scaleIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) both",
+        "blur-in": "blurIn 0.8s cubic-bezier(0.16, 1, 0.3, 1) both",
         "ken-burns": "kenBurns 20s ease-in-out infinite alternate",
+        "shimmer": "shimmer 2s linear infinite",
+        "float": "float 6s ease-in-out infinite",
+        "pulse-soft": "pulseSoft 3s ease-in-out infinite",
       },
       keyframes: {
         fadeIn: {
           "0%": { opacity: "0" },
           "100%": { opacity: "1" },
         },
+        fadeInUp: {
+          "0%": { opacity: "0", transform: "translateY(24px)" },
+          "100%": { opacity: "1", transform: "translateY(0)" },
+        },
+        fadeInDown: {
+          "0%": { opacity: "0", transform: "translateY(-24px)" },
+          "100%": { opacity: "1", transform: "translateY(0)" },
+        },
         slideUp: {
           "0%": { opacity: "0", transform: "translateY(20px)" },
           "100%": { opacity: "1", transform: "translateY(0)" },
         },
+        scaleIn: {
+          "0%": { opacity: "0", transform: "scale(0.95)" },
+          "100%": { opacity: "1", transform: "scale(1)" },
+        },
+        blurIn: {
+          "0%": { opacity: "0", filter: "blur(12px)" },
+          "100%": { opacity: "1", filter: "blur(0)" },
+        },
         kenBurns: {
           "0%": { transform: "scale(1) translate(0, 0)" },
           "100%": { transform: "scale(1.1) translate(-2%, -2%)" },
+        },
+        shimmer: {
+          "0%": { backgroundPosition: "-200% 0" },
+          "100%": { backgroundPosition: "200% 0" },
+        },
+        float: {
+          "0%, 100%": { transform: "translateY(0)" },
+          "50%": { transform: "translateY(-8px)" },
+        },
+        pulseSoft: {
+          "0%, 100%": { opacity: "1" },
+          "50%": { opacity: "0.7" },
         },
       },
     },

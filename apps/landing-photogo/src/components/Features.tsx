@@ -1,3 +1,5 @@
+"use client";
+
 import {
   BadgeCheck,
   Camera,
@@ -9,6 +11,7 @@ import {
   Shield,
   Users,
 } from "lucide-react";
+import { FadeInSection } from "./FadeInSection";
 
 const features = {
   photographers: [
@@ -75,7 +78,7 @@ export function Features() {
   return (
     <section id="features" className="border-t border-ink-900/5 py-20 dark:border-paper-100/5 sm:py-32">
       <div className="container-wide">
-        <div className="mx-auto max-w-2xl text-center">
+        <FadeInSection className="mx-auto max-w-2xl text-center">
           <span className="badge mb-6">Recursos</span>
           <h2 className="text-balance font-mono text-4xl font-semibold tracking-tight sm:text-5xl">
             Tudo que um fotógrafo
@@ -85,32 +88,40 @@ export function Features() {
           <p className="mt-4 text-pretty text-lg text-ink-600 dark:text-paper-200">
             Da primeira foto ao payout — tudo otimizado para você vender mais.
           </p>
-        </div>
+        </FadeInSection>
 
         <div id="photographers" className="mt-20">
-          <h3 className="font-mono text-2xl font-semibold tracking-tight">
-            Para Fotógrafos
-          </h3>
-          <p className="mt-2 text-ink-600 dark:text-paper-200">
-            Da primeira foto ao payout — tudo otimizado.
-          </p>
+          <FadeInSection>
+            <h3 className="font-mono text-2xl font-semibold tracking-tight">
+              Para Fotógrafos
+            </h3>
+            <p className="mt-2 text-ink-600 dark:text-paper-200">
+              Da primeira foto ao payout — tudo otimizado.
+            </p>
+          </FadeInSection>
           <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {features.photographers.map((feature) => (
-              <FeatureCard key={feature.title} {...feature} />
+            {features.photographers.map((feature, idx) => (
+              <FadeInSection key={feature.title} delay={`delay-${((idx % 3) + 1) * 100}`}>
+                <FeatureCard {...feature} />
+              </FadeInSection>
             ))}
           </div>
         </div>
 
         <div id="buyers" className="mt-20">
-          <h3 className="font-mono text-2xl font-semibold tracking-tight">
-            Para Compradores
-          </h3>
-          <p className="mt-2 text-ink-600 dark:text-paper-200">
-            Encontre a foto certa em segundos.
-          </p>
+          <FadeInSection>
+            <h3 className="font-mono text-2xl font-semibold tracking-tight">
+              Para Compradores
+            </h3>
+            <p className="mt-2 text-ink-600 dark:text-paper-200">
+              Encontre a foto certa em segundos.
+            </p>
+          </FadeInSection>
           <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {features.buyers.map((feature) => (
-              <FeatureCard key={feature.title} {...feature} />
+            {features.buyers.map((feature, idx) => (
+              <FadeInSection key={feature.title} delay={`delay-${((idx % 3) + 1) * 100}`}>
+                <FeatureCard {...feature} />
+              </FadeInSection>
             ))}
           </div>
         </div>
@@ -129,8 +140,8 @@ function FeatureCard({
   description: string;
 }) {
   return (
-    <div className="group relative rounded-2xl border border-ink-900/5 bg-paper-50 p-6 transition hover:border-sunset-500/20 hover:shadow-lg dark:border-paper-100/5 dark:bg-ink-900 dark:hover:border-sunset-500/20">
-      <div className="inline-flex rounded-lg bg-sunset-500/10 p-2.5 text-sunset-500 transition group-hover:bg-sunset-500/15">
+    <div className="group h-full rounded-2xl border border-ink-900/5 bg-paper-50 p-6 transition hover:-translate-y-1 hover:border-sunset-500/20 hover:shadow-lg dark:border-paper-100/5 dark:bg-ink-900 dark:hover:border-sunset-500/20">
+      <div className="inline-flex rounded-lg bg-sunset-500/10 p-2.5 text-sunset-500 transition group-hover:scale-110 group-hover:bg-sunset-500/15">
         <Icon className="h-5 w-5" strokeWidth={1.75} />
       </div>
       <h4 className="mt-4 font-mono text-lg font-semibold tracking-tight">{title}</h4>
