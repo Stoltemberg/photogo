@@ -287,6 +287,82 @@ input[type="checkbox"] {
   transition: background-color 200ms ease, border-color 200ms ease;
 }
 
+/* === Sidebar width transition === */
+@keyframes sidebar-collapse {
+  0% { transform: scaleX(1); }
+  100% { transform: scaleX(0.7); }
+}
+
+@keyframes sidebar-expand {
+  0% { transform: scaleX(0.7); }
+  100% { transform: scaleX(1); }
+}
+
+.sidebar-transition {
+  transition: width 380ms cubic-bezier(0.32, 0.72, 0, 1),
+              transform 380ms cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+/* Subtle background flash on collapse toggle */
+@keyframes sidebar-bg-flash {
+  0% { background-color: rgb(255 107 53 / 0.05); }
+  100% { background-color: transparent; }
+}
+
+.sidebar-flash {
+  animation: sidebar-bg-flash 600ms ease-out;
+}
+
+/* Content fade + slight horizontal slide when sidebar collapses */
+.sidebar-content-enter {
+  animation: sidebar-content-in 380ms cubic-bezier(0.32, 0.72, 0, 1) both;
+}
+.sidebar-content-leave {
+  animation: sidebar-content-out 200ms ease-out both;
+}
+
+@keyframes sidebar-content-in {
+  from { opacity: 0; transform: translateX(-6px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes sidebar-content-out {
+  from { opacity: 1; transform: translateX(0); }
+  to { opacity: 0; transform: translateX(-6px); }
+}
+
+/* Icon pivot when sidebar collapses (rotate slightly) */
+@keyframes icon-pivot {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(90deg); }
+}
+
+.icon-pivot {
+  animation: icon-pivot 380ms cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+/* Button pulse on toggle */
+.toggle-btn {
+  position: relative;
+  overflow: hidden;
+}
+
+.toggle-btn::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle, rgb(255 107 53 / 0.4) 0%, transparent 70%);
+  opacity: 0;
+  transform: scale(0);
+  transition: opacity 200ms, transform 380ms;
+}
+
+.toggle-btn:active::after {
+  opacity: 1;
+  transform: scale(2);
+  transition: 0s;
+}
+
 /* === Thin scrollbars === */
 .scrollbar-thin {
   scrollbar-width: thin;
