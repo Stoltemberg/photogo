@@ -136,7 +136,7 @@ export function DashboardShell({
             </div>
 
             {/* Nav */}
-            <nav className="flex-1 overflow-y-auto p-3">
+            <nav className="flex-1 overflow-y-auto overflow-x-hidden p-3 scrollbar-thin">
               <ul className="space-y-1">
                 {navItems.map(({ href, label, icon: Icon }) => {
                   const isActive = pathname === href || (href !== '/dashboard' && pathname.startsWith(href))

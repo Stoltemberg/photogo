@@ -23,6 +23,7 @@ import {
   ExternalLink,
 } from 'lucide-react'
 import { AnimatedTabs } from '@/components/animations/AnimatedTabs'
+import { TabPanel } from '@/components/animations/TabPanel'
 import { Modal } from '@/components/Modal'
 import { DropZone } from '@/components/DropZone'
 
@@ -348,67 +349,69 @@ export default function PortfolioPage() {
         </div>
       )}
 
-      {tab === 'albums' && !selectedAlbum && (
-        <>
-          {albums.length === 0 ? (
-            <EmptyState
-              icon={Layers}
-              title="Nenhum álbum ainda"
-              description="Crie um álbum para organizar suas fotos por evento, viagem ou tema"
-              action={
-                <button
-                  onClick={() => setShowCreateAlbum(true)}
-                  className="btn-primary mt-4 flex items-center gap-2 px-5 py-2.5 text-sm"
-                >
-                  <Plus className="h-4 w-4" /> Criar primeiro álbum
-                </button>
-              }
-            />
-          ) : (
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-              {albums.map((album) => {
-                const photoCount = album.album_photos?.[0]?.count || 0
-                const coverPhoto = photos.find((p) => p.id === album.cover_photo_id)
-                return (
+      <TabPanel active={tab} tabId="albums">
+        {!selectedAlbum && (
+          <>
+            {albums.length === 0 ? (
+              <EmptyState
+                icon={Layers}
+                title="Nenhum álbum ainda"
+                description="Crie um álbum para organizar suas fotos por evento, viagem ou tema"
+                action={
                   <button
-                    key={album.id}
-                    onClick={() => setSelectedAlbum(album)}
-                    className="group relative aspect-[4/3] overflow-hidden rounded-2xl border border-ink-900/5 bg-paper-50 text-left dark:border-paper-100/5 dark:bg-ink-900"
+                    onClick={() => setShowCreateAlbum(true)}
+                    className="btn-primary mt-4 flex items-center gap-2 px-5 py-2.5 text-sm"
                   >
-                    {coverPhoto ? (
-                      <img
-                        src={coverPhoto.thumbnail_url || coverPhoto.image_url}
-                        alt=""
-                        className="h-full w-full object-cover transition group-hover:scale-105"
-                      />
-                    ) : photoCount > 0 ? (
-                      <img
-                        src={photos.find((p) => photoAlbumMap[p.id]?.includes(album.id))?.image_url || ''}
-                        alt=""
-                        className="h-full w-full object-cover transition group-hover:scale-105"
-                      />
-                    ) : (
-                      <div className="flex h-full w-full items-center justify-center bg-ink-100 dark:bg-ink-800">
-                        <ImageIcon className="h-8 w-8 text-ink-300" />
-                      </div>
-                    )}
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
-                    <div className="absolute inset-x-3 bottom-3 text-left text-white">
-                      <p className="font-mono text-base font-semibold truncate">{album.name}</p>
-                      <p className="text-xs text-white/70">
-                        {photoCount} {photoCount === 1 ? 'foto' : 'fotos'}
-                        {album.is_public && ' · Público'}
-                      </p>
-                    </div>
+                    <Plus className="h-4 w-4" /> Criar primeiro álbum
                   </button>
-                )
-              })}
-            </div>
-          )}
-        </>
-      )}
+                }
+              />
+            ) : (
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+                {albums.map((album) => {
+                  const photoCount = album.album_photos?.[0]?.count || 0
+                  const coverPhoto = photos.find((p) => p.id === album.cover_photo_id)
+                  return (
+                    <button
+                      key={album.id}
+                      onClick={() => setSelectedAlbum(album)}
+                      className="group relative aspect-[4/3] overflow-hidden rounded-2xl border border-ink-900/5 bg-paper-50 text-left hover-lift dark:border-paper-100/5 dark:bg-ink-900"
+                    >
+                      {coverPhoto ? (
+                        <img
+                          src={coverPhoto.thumbnail_url || coverPhoto.image_url}
+                          alt=""
+                          className="h-full w-full object-cover transition group-hover:scale-105"
+                        />
+                      ) : photoCount > 0 ? (
+                        <img
+                          src={photos.find((p) => photoAlbumMap[p.id]?.includes(album.id))?.image_url || ''}
+                          alt=""
+                          className="h-full w-full object-cover transition group-hover:scale-105"
+                        />
+                      ) : (
+                        <div className="flex h-full w-full items-center justify-center bg-ink-100 dark:bg-ink-800">
+                          <ImageIcon className="h-8 w-8 text-ink-300" />
+                        </div>
+                      )}
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
+                      <div className="absolute inset-x-3 bottom-3 text-left text-white">
+                        <p className="font-mono text-base font-semibold truncate">{album.name}</p>
+                        <p className="text-xs text-white/70">
+                          {photoCount} {photoCount === 1 ? 'foto' : 'fotos'}
+                          {album.is_public && ' · Público'}
+                        </p>
+                      </div>
+                    </button>
+                  )
+                })}
+              </div>
+            )}
+          </>
+        )}
+      </TabPanel>
 
-      {tab !== 'albums' && (
+      <TabPanel active={tab} tabId={selectedAlbum ? 'unfiled' : tab}>
         <>
           {visiblePhotos.length === 0 ? (
             <EmptyState
@@ -488,7 +491,7 @@ export default function PortfolioPage() {
             </div>
           )}
         </>
-      )}
+      </TabPanel>
 
       {selectedAlbum && (
         <div className="sticky bottom-4 mt-6 flex justify-center gap-2">

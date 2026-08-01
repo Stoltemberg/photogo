@@ -3,7 +3,8 @@
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
-import { Bell, Lock, Globe, CreditCard, Loader2, Check, Trash2, AlertCircle } from 'lucide-react'
+import { useTheme, type Theme } from '@/lib/theme-context'
+import { Bell, Lock, Globe, CreditCard, Loader2, Check, Trash2, AlertCircle, Sun, Moon, Monitor, Palette } from 'lucide-react'
 
 export default function ConfiguracoesPage() {
   const supabase = createClient()
@@ -24,6 +25,8 @@ export default function ConfiguracoesPage() {
 
   // Account
   const [userEmail, setUserEmail] = useState('')
+
+  const { theme, setTheme } = useTheme()
 
   useEffect(() => {
     const loadSettings = async () => {
@@ -188,6 +191,56 @@ export default function ConfiguracoesPage() {
             </div>
             <Toggle checked={showSalesStats} onChange={setShowSalesStats} />
           </div>
+        </div>
+      </div>
+
+      {/* Aparência — seletor de tema */}
+      <div className="rounded-2xl border border-ink-900/5 bg-paper-50 p-6 dark:border-paper-100/5 dark:bg-ink-900">
+        <div className="flex items-center gap-2 mb-4">
+          <Palette className="h-5 w-5 text-ink-400" />
+          <h3 className="font-mono text-lg font-semibold text-ink-900 dark:text-paper-50">
+            Aparência
+          </h3>
+        </div>
+        <p className="mb-4 text-sm text-ink-600 dark:text-paper-200">
+          Escolha como o PhotoGo deve aparecer para você.
+        </p>
+
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          {[
+            { id: 'light' as Theme, label: 'Claro', desc: 'Sempre claro', icon: Sun },
+            { id: 'dark' as Theme, label: 'Escuro', desc: 'Sempre escuro', icon: Moon },
+            { id: 'system' as Theme, label: 'Sistema', desc: 'Segue seu dispositivo', icon: Monitor },
+          ].map(({ id, label, desc, icon: Icon }) => (
+            <button
+              key={id}
+              onClick={() => setTheme(id)}
+              className={`group relative flex flex-col items-start gap-2 rounded-2xl border-2 p-4 text-left transition-all duration-300 ${
+                theme === id
+                  ? 'border-sunset-500 bg-sunset-500/5 shadow-md'
+                  : 'border-ink-900/5 hover:border-sunset-500/40 hover:bg-sunset-500/5 dark:border-paper-100/5'
+              }`}
+            >
+              <div className="flex w-full items-center justify-between">
+                <div className={`flex h-9 w-9 items-center justify-center rounded-xl transition ${
+                  theme === id ? 'bg-sunset-500 text-white' : 'bg-ink-100 text-ink-600 dark:bg-ink-800 dark:text-paper-200'
+                }`}>
+                  <Icon className="h-5 w-5" />
+                </div>
+                {theme === id && (
+                  <div className="flex h-5 w-5 items-center justify-center rounded-full bg-sunset-500">
+                    <Check className="h-3 w-3 text-white" strokeWidth={3} />
+                  </div>
+                )}
+              </div>
+              <div>
+                <p className="font-mono text-sm font-semibold text-ink-900 dark:text-paper-50">
+                  {label}
+                </p>
+                <p className="text-xs text-ink-500">{desc}</p>
+              </div>
+            </button>
+          ))}
         </div>
       </div>
 
