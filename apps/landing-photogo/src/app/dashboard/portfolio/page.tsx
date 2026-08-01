@@ -23,6 +23,8 @@ import {
   ExternalLink,
 } from 'lucide-react'
 import { AnimatedTabs } from '@/components/animations/AnimatedTabs'
+import { Modal } from '@/components/Modal'
+import { DropZone } from '@/components/DropZone'
 
 type Photo = {
   id: string
@@ -560,31 +562,25 @@ function EmptyState({ icon: Icon, title, description, action }: any) {
   )
 }
 
-function Modal({ open, onClose, title, children }: any) {
-  if (!open) return null
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
-      <div className="relative w-full max-w-lg rounded-2xl border border-ink-900/5 bg-paper-50 p-6 dark:border-paper-100/5 dark:bg-ink-900">
-        <div className="mb-4 flex items-center justify-between">
-          <h2 className="font-mono text-lg font-semibold text-ink-900 dark:text-paper-50">{title}</h2>
-          <button onClick={onClose} className="rounded-lg p-1 text-ink-400 hover:bg-ink-100 hover:text-ink-900 dark:hover:bg-ink-800">
-            <X className="h-5 w-5" />
-          </button>
-        </div>
-        {children}
-      </div>
-    </div>
-  )
-}
-
 function UploadModal({ open, onClose, onUploaded, supabase, userId, onError }: any) {
   const [title, setTitle] = useState('')
   const [description, setDescription] = useState('')
   const [price, setPrice] = useState('')
   const [category, setCategory] = useState('Paisagem')
   const [file, setFile] = useState<File | null>(null)
-  const [previewUrl, setPreviewUrl] = useState('')
   const [uploading, setUploading] = useState(false)
+  const [progress, setProgress] = useState(0)
+
+  // Reset state when modal closes
+  useEffect(() => {
+    if (!open) {
+      setTitle('')
+      setDescription('')
+      setPrice('')
+      setFile(null)
+      setProgress(0)
+    }
+  }, [open])
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -593,6 +589,7 @@ function UploadModal({ open, onClose, onUploaded, supabase, userId, onError }: a
       return
     }
     setUploading(true)
+    setProgress(10)
     onError('')
     try {
       const fd = new FormData()
@@ -601,14 +598,14 @@ function UploadModal({ open, onClose, onUploaded, supabase, userId, onError }: a
       fd.append('description', description)
       fd.append('price', price)
       fd.append('category', category)
+
+      setProgress(40)
+
       const res = await fetch('/api/photos', { method: 'POST', body: fd })
+      setProgress(80)
       const data = await res.json()
       if (!res.ok) throw new Error(data.error || 'Erro')
-      setTitle('')
-      setDescription('')
-      setPrice('')
-      setFile(null)
-      setPreviewUrl('')
+      setProgress(100)
       onUploaded()
     } catch (err) {
       onError(err instanceof Error ? err.message : 'Erro ao enviar')
@@ -618,12 +615,12 @@ function UploadModal({ open, onClose, onUploaded, supabase, userId, onError }: a
   }
 
   return (
-    <Modal open={open} onClose={onClose} title="Enviar foto">
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <div className="grid grid-cols-2 gap-4">
-          <div className="col-span-2">
+    <Modal open={open} onClose={onClose} title="Enviar foto" size="lg">
+      <form onSubmit={handleSubmit} className="space-y-5">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="sm:col-span-2">
             <label className="block text-sm font-medium text-ink-700 dark:text-paper-100 mb-1.5">
-              Título (privado)
+              Título <span className="text-ink-400 text-xs">(privado)</span>
             </label>
             <input
               type="text"
@@ -631,10 +628,13 @@ function UploadModal({ open, onClose, onUploaded, supabase, userId, onError }: a
               onChange={(e) => setTitle(e.target.value)}
               className="w-full rounded-xl border border-ink-900/10 bg-paper-50 px-4 py-2.5 text-sm focus:border-sunset-500 focus:outline-none focus:ring-2 focus:ring-sunset-500/20 dark:border-paper-100/10 dark:bg-ink-800 dark:text-paper-100"
               placeholder="Ex: Pôr do sol na Serra"
+              disabled={uploading}
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-ink-700 dark:text-paper-100 mb-1.5">Preço (R$)</label>
+            <label className="block text-sm font-medium text-ink-700 dark:text-paper-100 mb-1.5">
+              Preço (R$)
+            </label>
             <input
               type="number"
               step="0.01"
@@ -643,13 +643,17 @@ function UploadModal({ open, onClose, onUploaded, supabase, userId, onError }: a
               onChange={(e) => setPrice(e.target.value)}
               className="w-full rounded-xl border border-ink-900/10 bg-paper-50 px-4 py-2.5 text-sm focus:border-sunset-500 focus:outline-none focus:ring-2 focus:ring-sunset-500/20 dark:border-paper-100/10 dark:bg-ink-800 dark:text-paper-100"
               placeholder="49,90"
+              disabled={uploading}
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-ink-700 dark:text-paper-100 mb-1.5">Categoria</label>
+            <label className="block text-sm font-medium text-ink-700 dark:text-paper-100 mb-1.5">
+              Categoria
+            </label>
             <select
               value={category}
               onChange={(e) => setCategory(e.target.value)}
+              disabled={uploading}
               className="w-full rounded-xl border border-ink-900/10 bg-paper-50 px-4 py-2.5 text-sm focus:border-sunset-500 focus:outline-none focus:ring-2 focus:ring-sunset-500/20 dark:border-paper-100/10 dark:bg-ink-800 dark:text-paper-100"
             >
               {['Paisagem', 'Retrato', 'Urbano', 'Natureza', 'Esporte', 'Eventos', 'Comida', 'Animal', 'Arquitetura', 'Abstrato'].map((c) => (
@@ -657,46 +661,55 @@ function UploadModal({ open, onClose, onUploaded, supabase, userId, onError }: a
               ))}
             </select>
           </div>
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium text-ink-700 dark:text-paper-100 mb-1.5">Descrição (privada)</label>
-          <textarea
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-            rows={2}
-            className="w-full rounded-xl border border-ink-900/10 bg-paper-50 px-4 py-2.5 text-sm focus:border-sunset-500 focus:outline-none focus:ring-2 focus:ring-sunset-500/20 dark:border-paper-100/10 dark:bg-ink-800 dark:text-paper-100"
-            placeholder="Notas internas sobre a foto..."
-          />
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium text-ink-700 dark:text-paper-100 mb-1.5">Arquivo</label>
-          <div className="flex items-center gap-4">
-            <label className="flex-1 cursor-pointer rounded-xl border-2 border-dashed border-ink-200 px-4 py-6 text-center text-sm text-ink-500 hover:border-sunset-500 hover:text-sunset-500 dark:border-paper-100/20 dark:text-paper-200">
-              <input
-                type="file"
-                accept="image/*"
-                onChange={(e) => {
-                  const f = e.target.files?.[0]
-                  if (f) {
-                    setFile(f)
-                    setPreviewUrl(URL.createObjectURL(f))
-                  }
-                }}
-                className="hidden"
-              />
-              {file ? file.name : 'Clique para selecionar'}
+          <div className="sm:col-span-2">
+            <label className="block text-sm font-medium text-ink-700 dark:text-paper-100 mb-1.5">
+              Descrição <span className="text-ink-400 text-xs">(privada)</span>
             </label>
-            {previewUrl && <img src={previewUrl} alt="" className="h-20 w-20 rounded-xl object-cover" />}
+            <textarea
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              rows={2}
+              disabled={uploading}
+              className="w-full rounded-xl border border-ink-900/10 bg-paper-50 px-4 py-2.5 text-sm focus:border-sunset-500 focus:outline-none focus:ring-2 focus:ring-sunset-500/20 dark:border-paper-100/10 dark:bg-ink-800 dark:text-paper-100"
+              placeholder="Notas internas sobre a foto..."
+            />
+          </div>
+          <div className="sm:col-span-2">
+            <label className="block text-sm font-medium text-ink-700 dark:text-paper-100 mb-1.5">
+              Arquivo da foto
+            </label>
+            <DropZone
+              value={file}
+              onFile={(f) => setFile(f)}
+              accept="image/*"
+              maxSizeMB={50}
+            />
           </div>
         </div>
 
-        <div className="flex gap-3">
-          <button type="submit" disabled={uploading} className="btn-primary flex items-center gap-2 px-5 py-2.5 text-sm">
-            {uploading ? <><Loader2 className="h-4 w-4 animate-spin" /> Enviando...</> : <><Upload className="h-4 w-4" /> Publicar</>}
+        {uploading && (
+          <div className="overflow-hidden rounded-full bg-ink-100 dark:bg-ink-800">
+            <div
+              className="h-1.5 bg-gradient-to-r from-sunset-500 to-orange-400 transition-all duration-300"
+              style={{ width: `${progress}%` }}
+            />
+          </div>
+        )}
+
+        <div className="flex gap-3 border-t border-ink-900/5 pt-4 dark:border-paper-100/5">
+          <button
+            type="submit"
+            disabled={uploading || !file || !title || !price}
+            className="btn-primary flex items-center gap-2 px-5 py-2.5 text-sm disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            {uploading ? <><Loader2 className="h-4 w-4 animate-spin" /> Enviando...</> : <><Upload className="h-4 w-4" /> Publicar foto</>}
           </button>
-          <button type="button" onClick={onClose} className="rounded-xl border border-ink-900/10 px-5 py-2.5 text-sm text-ink-700 hover:bg-ink-100 dark:border-paper-100/10 dark:text-paper-200">
+          <button
+            type="button"
+            onClick={onClose}
+            disabled={uploading}
+            className="rounded-xl border border-ink-900/10 px-5 py-2.5 text-sm text-ink-700 hover:bg-ink-100 disabled:opacity-50 dark:border-paper-100/10 dark:text-paper-200 dark:hover:bg-ink-800"
+          >
             Cancelar
           </button>
         </div>
@@ -708,7 +721,25 @@ function UploadModal({ open, onClose, onUploaded, supabase, userId, onError }: a
 function CreateAlbumModal({ open, onClose, onCreated, onError }: any) {
   const [name, setName] = useState('')
   const [description, setDescription] = useState('')
+  const [coverColor, setCoverColor] = useState('sunset')
   const [creating, setCreating] = useState(false)
+
+  const coverColors = [
+    { id: 'sunset', label: 'Sunset', class: 'from-sunset-500 to-orange-500' },
+    { id: 'purple', label: 'Purple', class: 'from-purple-500 to-pink-500' },
+    { id: 'blue', label: 'Blue', class: 'from-blue-500 to-cyan-500' },
+    { id: 'green', label: 'Green', class: 'from-green-500 to-emerald-500' },
+    { id: 'gray', label: 'Cinza', class: 'from-ink-400 to-ink-600' },
+  ]
+
+  // Reset state when modal closes
+  useEffect(() => {
+    if (!open) {
+      setName('')
+      setDescription('')
+      setCoverColor('sunset')
+    }
+  }, [open])
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -726,8 +757,6 @@ function CreateAlbumModal({ open, onClose, onCreated, onError }: any) {
       const data = await res.json()
       if (!res.ok) throw new Error(data.error || 'Erro')
       onCreated({ ...data, album_photos: [{ count: 0 }] })
-      setName('')
-      setDescription('')
     } catch (err) {
       onError(err instanceof Error ? err.message : 'Erro')
     } finally {
@@ -736,10 +765,42 @@ function CreateAlbumModal({ open, onClose, onCreated, onError }: any) {
   }
 
   return (
-    <Modal open={open} onClose={onClose} title="Criar álbum">
-      <form onSubmit={handleSubmit} className="space-y-4">
+    <Modal open={open} onClose={onClose} title="Criar álbum" size="lg">
+      <form onSubmit={handleSubmit} className="space-y-5">
+        {/* Cover preview */}
         <div>
-          <label className="block text-sm font-medium text-ink-700 dark:text-paper-100 mb-1.5">Nome do álbum</label>
+          <label className="block text-sm font-medium text-ink-700 dark:text-paper-100 mb-2">
+            Capa do álbum
+          </label>
+          <div className="grid grid-cols-5 gap-2">
+            {coverColors.map((c) => (
+              <button
+                key={c.id}
+                type="button"
+                onClick={() => setCoverColor(c.id)}
+                className={`relative aspect-[4/3] overflow-hidden rounded-xl bg-gradient-to-br transition ${
+                  c.class
+                } ${
+                  coverColor === c.id
+                    ? 'ring-2 ring-sunset-500 ring-offset-2 ring-offset-paper-50 dark:ring-offset-ink-900 scale-95'
+                    : 'hover:scale-105'
+                }`}
+                aria-label={c.label}
+              >
+                {coverColor === c.id && (
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <Check className="h-5 w-5 text-white drop-shadow-lg" strokeWidth={3} />
+                  </div>
+                )}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-ink-700 dark:text-paper-100 mb-1.5">
+            Nome do álbum
+          </label>
           <input
             type="text"
             value={name}
@@ -747,23 +808,36 @@ function CreateAlbumModal({ open, onClose, onCreated, onError }: any) {
             className="w-full rounded-xl border border-ink-900/10 bg-paper-50 px-4 py-2.5 text-sm focus:border-sunset-500 focus:outline-none focus:ring-2 focus:ring-sunset-500/20 dark:border-paper-100/10 dark:bg-ink-800 dark:text-paper-100"
             placeholder="Ex: Ensaio Casamento Praia"
             autoFocus
+            disabled={creating}
           />
         </div>
         <div>
-          <label className="block text-sm font-medium text-ink-700 dark:text-paper-100 mb-1.5">Descrição (opcional)</label>
+          <label className="block text-sm font-medium text-ink-700 dark:text-paper-100 mb-1.5">
+            Descrição <span className="text-ink-400 text-xs">(opcional)</span>
+          </label>
           <textarea
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             rows={2}
+            disabled={creating}
             className="w-full rounded-xl border border-ink-900/10 bg-paper-50 px-4 py-2.5 text-sm focus:border-sunset-500 focus:outline-none focus:ring-2 focus:ring-sunset-500/20 dark:border-paper-100/10 dark:bg-ink-800 dark:text-paper-100"
             placeholder="Detalhes do álbum..."
           />
         </div>
-        <div className="flex gap-3">
-          <button type="submit" disabled={creating} className="btn-primary flex items-center gap-2 px-5 py-2.5 text-sm">
+        <div className="flex gap-3 border-t border-ink-900/5 pt-4 dark:border-paper-100/5">
+          <button
+            type="submit"
+            disabled={creating || !name.trim()}
+            className="btn-primary flex items-center gap-2 px-5 py-2.5 text-sm disabled:cursor-not-allowed disabled:opacity-50"
+          >
             {creating ? <><Loader2 className="h-4 w-4 animate-spin" /> Criando...</> : <><FolderPlus className="h-4 w-4" /> Criar álbum</>}
           </button>
-          <button type="button" onClick={onClose} className="rounded-xl border border-ink-900/10 px-5 py-2.5 text-sm text-ink-700 hover:bg-ink-100 dark:border-paper-100/10 dark:text-paper-200">
+          <button
+            type="button"
+            onClick={onClose}
+            disabled={creating}
+            className="rounded-xl border border-ink-900/10 px-5 py-2.5 text-sm text-ink-700 hover:bg-ink-100 disabled:opacity-50 dark:border-paper-100/10 dark:text-paper-200 dark:hover:bg-ink-800"
+          >
             Cancelar
           </button>
         </div>
