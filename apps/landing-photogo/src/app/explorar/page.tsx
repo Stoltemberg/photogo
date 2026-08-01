@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { Camera, MapPin, ShoppingBag, TrendingUp } from 'lucide-react'
 import { ExploreFilters } from './filters'
 import { FadeIn } from '@/components/animations/FadeIn'
+import { AnimatedTabs } from '@/components/animations/AnimatedTabs'
 
 type PublicPhoto = {
   id: string

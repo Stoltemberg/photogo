@@ -22,6 +22,7 @@ import {
   ArrowUpDown,
   ExternalLink,
 } from 'lucide-react'
+import { AnimatedTabs } from '@/components/animations/AnimatedTabs'
 
 type Photo = {
   id: string
@@ -274,28 +275,18 @@ export default function PortfolioPage() {
       )}
 
       {!selectedAlbum && (
-        <div className="border-b border-ink-900/5 dark:border-paper-100/5">
-          <nav className="flex gap-6">
-            {[
-              { id: 'all' as const, label: 'Tudo', count: photos.length },
-              { id: 'albums' as const, label: 'Álbuns', count: albums.length },
-              { id: 'unfiled' as const, label: 'Avulsas', count: unfiledCount },
-            ].map((t) => (
-              <button
-                key={t.id}
-                onClick={() => setTab(t.id)}
-                className={`flex items-center gap-2 border-b-2 px-1 pb-3 text-sm transition ${
-                  tab === t.id
-                    ? 'border-sunset-500 text-sunset-500 font-medium'
-                    : 'border-transparent text-ink-500 hover:text-ink-700 dark:hover:text-paper-200'
-                }`}
-              >
-                {t.label}
-                <span className="rounded-full bg-ink-100 px-2 py-0.5 text-xs dark:bg-ink-800">{t.count}</span>
-              </button>
-            ))}
-          </nav>
-        </div>
+        <AnimatedTabs
+          tabs={[
+            { id: 'all', label: 'Tudo', count: photos.length },
+            { id: 'albums', label: 'Álbuns', count: albums.length },
+            { id: 'unfiled', label: 'Avulsas', count: unfiledCount },
+          ].map((t) => ({
+            ...t,
+            onClick: () => setTab(t.id as Tab),
+          }))}
+          active={tab}
+          variant="underline"
+        />
       )}
 
       {(tab === 'all' || tab === 'unfiled' || selectedAlbum) && visiblePhotos.length > 0 && (

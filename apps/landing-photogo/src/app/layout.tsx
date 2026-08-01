@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { JetBrains_Mono, Inter } from "next/font/google";
 import { CartProvider } from "@/lib/cart-context";
+import { ThemeProvider } from "@/lib/theme-context";
 import "../styles/globals.css";
 
 const inter = Inter({
@@ -82,7 +83,9 @@ export default function RootLayout({
         />
       </head>
       <body className="font-sans">
-        <CartProvider>{children}</CartProvider>
+        <ThemeProvider>
+          <CartProvider>{children}</CartProvider>
+        </ThemeProvider>
       </body>
     </html>
   );

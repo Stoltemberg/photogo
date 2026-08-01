@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { createClient as createServiceClient } from '@supabase/supabase-js'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -7,6 +8,16 @@ const corsHeaders = {
 }
 
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+
+function hashIp(ip: string): string {
+  // Simple hash — production should use crypto.subtle
+  let h = 0
+  for (let i = 0; i < ip.length; i++) {
+    h = ((h << 5) - h) + ip.charCodeAt(i)
+    h |= 0
+  }
+  return h.toString(16).padStart(8, '0')
+}
 
 export async function POST(request: NextRequest) {
   try {
@@ -27,14 +38,46 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // In production, this stores in Supabase `waitlist` table
-    // and triggers a welcome email via Resend/SendGrid
-    console.log('[Waitlist] New signup:', email)
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+    const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
 
-    // TODO: Store in Supabase
-    // await supabaseAdmin.from('waitlist').insert({ email, created_at: new Date() })
-    // TODO: Send welcome email
-    // await resend.emails.send({ from: 'photo@photogo.com.br', to: email, subject: 'Bem-vindo!', ... })
+    if (!supabaseUrl || !serviceKey) {
+      return NextResponse.json(
+        { error: 'Backend not configured' },
+        { status: 503, headers: corsHeaders }
+      )
+    }
+
+    const supabase = createServiceClient(supabaseUrl, serviceKey)
+
+    const userAgent = request.headers.get('user-agent') || ''
+    const ip = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ||
+                request.headers.get('x-real-ip') || 'unknown'
+    const ipHash = hashIp(ip)
+
+    const { error } = await supabase
+      .from('waitlist_entries')
+      .insert({
+        email: email.toLowerCase().trim(),
+        source: 'landing',
+        user_agent: userAgent,
+        ip_hash: ipHash,
+      })
+
+    if (error) {
+      if (error.code === '23505') {
+        // Unique violation — already subscribed
+        return NextResponse.json(
+          { message: 'Você já está na lista! Avisaremos quando liberarmos.', email },
+          { status: 200, headers: corsHeaders }
+        )
+      }
+      console.error('[Waitlist] Supabase error:', error)
+      return NextResponse.json(
+        { error: 'Erro ao processar inscrição' },
+        { status: 500, headers: corsHeaders }
+      )
+    }
 
     return NextResponse.json(
       { message: 'Inscrito com sucesso! Em breve entraremos em contato.', email },
