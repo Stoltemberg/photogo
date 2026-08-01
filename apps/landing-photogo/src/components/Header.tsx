@@ -90,6 +90,10 @@ export function Header() {
             )}
           </button>
 
+          <Link href="/explorar" className="hidden md:inline-flex items-center gap-2 rounded-full px-3 py-2 text-sm text-ink-600 transition hover:text-ink-900 dark:text-paper-200 dark:hover:text-paper-50">
+            Explorar
+          </Link>
+
           <a href="#early-access" className="hidden btn-primary md:inline-flex">
             Acesso Antecipado
           </a>

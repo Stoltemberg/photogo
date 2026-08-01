@@ -3,6 +3,8 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
+
+export const dynamic = 'force-dynamic'
 import { useRouter } from 'next/navigation'
 import { ArrowRight, Loader2, Lock, Eye, EyeOff, Camera, CheckCircle2 } from 'lucide-react'
 

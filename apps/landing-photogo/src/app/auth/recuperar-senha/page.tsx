@@ -3,6 +3,8 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
+
+export const dynamic = 'force-dynamic'
 import { ArrowRight, Loader2, Mail, Camera, ArrowLeft, CheckCircle2 } from 'lucide-react'
 
 export default function ForgotPasswordPage() {

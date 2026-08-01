@@ -174,3 +174,115 @@
     transform: none;
   }
 }
+
+/* === Shimmer keyframes (for skeletons) === */
+@keyframes shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+/* === Gradient pulse === */
+@keyframes gradient-pulse {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+.animate-gradient {
+  background-size: 200% 200%;
+  animation: gradient-pulse 6s ease-in-out infinite;
+}
+
+/* === Float === */
+@keyframes float {
+  0%, 100% { transform: translateY(0) rotate(0); }
+  50% { transform: translateY(-12px) rotate(2deg); }
+}
+
+.animate-float {
+  animation: float 5s ease-in-out infinite;
+}
+
+.animate-float-delay {
+  animation: float 5s ease-in-out 1s infinite;
+}
+
+.animate-float-delay-2 {
+  animation: float 5s ease-in-out 2s infinite;
+}
+
+/* === Hover lift === */
+.hover-lift {
+  transition: transform 350ms cubic-bezier(0.16, 1, 0.3, 1),
+              box-shadow 350ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+.hover-lift:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 32px -8px rgb(255 107 53 / 0.18);
+}
+
+/* === Smooth tab underline === */
+.tab-indicator {
+  transition: left 350ms cubic-bezier(0.16, 1, 0.3, 1),
+              width 350ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* === Page enter === */
+@keyframes page-enter {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-page-enter {
+  animation: page-enter 500ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+/* === Bounce subtle === */
+@keyframes bounce-soft {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-4px); }
+}
+
+.animate-bounce-soft {
+  animation: bounce-soft 2s ease-in-out infinite;
+}
+
+/* === Pulse ring === */
+@keyframes pulse-ring {
+  0% {
+    box-shadow: 0 0 0 0 rgb(255 107 53 / 0.4);
+  }
+  70% {
+    box-shadow: 0 0 0 12px rgb(255 107 53 / 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgb(255 107 53 / 0);
+  }
+}
+
+.animate-pulse-ring {
+  animation: pulse-ring 2s ease-out infinite;
+}
+
+/* === Glow === */
+.glow-sunset {
+  box-shadow: 0 0 24px -4px rgb(255 107 53 / 0.35);
+}
+
+/* === Text gradient === */
+.text-gradient-sunset {
+  background: linear-gradient(135deg, #FF6B35 0%, #FF8A5C 50%, #FFB088 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* === Smooth checkbox === */
+input[type="checkbox"] {
+  transition: background-color 200ms ease, border-color 200ms ease;
+}
