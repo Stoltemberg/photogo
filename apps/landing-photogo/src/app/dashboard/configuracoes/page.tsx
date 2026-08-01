@@ -5,6 +5,8 @@ import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
 import { useTheme, type Theme } from '@/lib/theme-context'
 import { Bell, Lock, Globe, CreditCard, Loader2, Check, Trash2, AlertCircle, Sun, Moon, Monitor, Palette } from 'lucide-react'
+import { PageTransition } from '@/components/animations/PageTransition'
+
 
 export default function ConfiguracoesPage() {
   const supabase = createClient()
@@ -114,7 +116,7 @@ export default function ConfiguracoesPage() {
   }
 
   return (
-    <div className="space-y-6">
+    <PageTransition className="space-y-6">
       <div>
         <h1 className="font-mono text-2xl font-semibold text-ink-900 dark:text-paper-50">
           Configurações
@@ -313,6 +315,6 @@ export default function ConfiguracoesPage() {
           </>
         )}
       </button>
-    </div>
+    </PageTransition>
   )
 }

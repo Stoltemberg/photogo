@@ -3,6 +3,8 @@
 import { useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { Check, Loader2, CreditCard, Sparkles, Zap, Building } from 'lucide-react'
+import { PageTransition } from '@/components/animations/PageTransition'
+
 
 type Plan = {
   id: string
@@ -138,7 +140,7 @@ export default function PlanosPage() {
   }
 
   return (
-    <div className="space-y-6">
+    <PageTransition className="space-y-6">
       <div>
         <h1 className="font-mono text-2xl font-semibold text-ink-900 dark:text-paper-50">
           Assinatura & Planos
@@ -241,6 +243,6 @@ export default function PlanosPage() {
           )
         })}
       </div>
-    </div>
+    </PageTransition>
   )
 }

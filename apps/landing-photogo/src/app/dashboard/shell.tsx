@@ -52,30 +52,29 @@ export function DashboardShell({
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [collapsed, setCollapsed] = useState(false)
   const [flashing, setFlashing] = useState(false)
+  const [mounted, setMounted] = useState(false)
   const prevCollapsed = useRef(collapsed)
 
-  // Load collapsed state from localStorage
   useEffect(() => {
+    setMounted(true)
     try {
       const stored = localStorage.getItem(COLLAPSED_KEY)
       if (stored === 'true') setCollapsed(true)
     } catch {}
   }, [])
 
-  // Save collapsed state + trigger flash on toggle
   useEffect(() => {
     try {
       localStorage.setItem(COLLAPSED_KEY, collapsed ? 'true' : 'false')
     } catch {}
 
-    // Trigger background flash only on user toggle (skip initial load)
-    if (prevCollapsed.current !== collapsed && prevCollapsed.current !== undefined) {
+    if (prevCollapsed.current !== collapsed && prevCollapsed.current !== undefined && mounted) {
       setFlashing(true)
       const t = setTimeout(() => setFlashing(false), 600)
       return () => clearTimeout(t)
     }
     prevCollapsed.current = collapsed
-  }, [collapsed])
+  }, [collapsed, mounted])
 
   const handleLogout = async () => {
     const supabase = createClient()
@@ -103,21 +102,21 @@ export function DashboardShell({
       </header>
 
       <div className="flex">
-        {/* Sidebar */}
+        {/* Sidebar — fixed width with transition */}
         <aside
           className={`${
             sidebarOpen ? 'translate-x-0' : '-translate-x-full'
           } lg:translate-x-0 fixed lg:sticky top-0 left-0 z-40 h-screen flex-shrink-0 border-r border-ink-900/5 bg-paper-50 sidebar-transition dark:border-paper-100/5 dark:bg-ink-900 ${
             flashing ? 'sidebar-flash' : ''
-          } ${collapsed ? 'w-16' : 'w-64'}`}
+          }`}
           style={{
-            transformOrigin: 'left center',
+            width: collapsed ? '4rem' : '16rem',
           }}
         >
-          <div className="flex h-full flex-col overflow-hidden">
+          <div className="flex h-full w-full flex-col overflow-hidden">
             {/* Logo */}
-            <div className={`flex h-16 items-center border-b border-ink-900/5 dark:border-paper-100/5 ${
-              collapsed ? 'justify-center px-2' : 'gap-2 px-6'
+            <div className={`flex h-16 items-center border-b border-ink-900/5 dark:border-paper-100/5 sidebar-transition ${
+              collapsed ? 'justify-center px-0' : 'gap-2 px-6'
             }`}>
               <Link
                 href="/dashboard"
@@ -127,14 +126,12 @@ export function DashboardShell({
               >
                 <Camera className="h-6 w-6 flex-shrink-0 text-sunset-500" />
                 <span
-                  className={`truncate sidebar-transition-all ${
-                    collapsed
-                      ? 'opacity-0 -translate-x-2 w-0 overflow-hidden'
-                      : 'opacity-100 translate-x-0'
-                  }`}
+                  className="truncate"
                   style={{
-                    transition: 'opacity 200ms ease-out 100ms, transform 250ms ease-out, max-width 300ms ease',
-                    maxWidth: collapsed ? 0 : '200px',
+                    maxWidth: collapsed ? '0px' : '200px',
+                    opacity: collapsed ? 0 : 1,
+                    marginLeft: collapsed ? '0px' : undefined,
+                    transition: 'opacity 220ms ease-out, max-width 320ms cubic-bezier(0.32, 0.72, 0, 1)',
                   }}
                 >
                   PhotoGo
@@ -143,33 +140,33 @@ export function DashboardShell({
             </div>
 
             {/* User info */}
-            <div className={`border-b border-ink-900/5 dark:border-paper-100/5 ${
-              collapsed ? 'p-2' : 'p-4'
+            <div className={`border-b border-ink-900/5 dark:border-paper-100/5 sidebar-transition ${
+              collapsed ? 'p-2 flex justify-center' : 'p-4'
             }`}>
-              <div className={`flex items-center gap-3 ${collapsed ? 'justify-center' : ''}`}>
+              <div className={`flex items-center sidebar-transition ${collapsed ? 'justify-center gap-0' : 'gap-3'}`}>
                 {avatarUrl ? (
                   // eslint-disable-next-line @next/next/no-img-element
                   <img
                     src={avatarUrl}
                     alt={userName}
-                    className={`flex-shrink-0 rounded-full object-cover sidebar-transition-all ${
+                    className={`flex-shrink-0 rounded-full object-cover sidebar-transition ${
                       collapsed ? 'h-9 w-9' : 'h-10 w-10'
                     }`}
                   />
                 ) : (
-                  <div className={`flex-shrink-0 rounded-full bg-sunset-500/10 flex items-center justify-center sidebar-transition-all ${
+                  <div className={`flex-shrink-0 rounded-full bg-sunset-500/10 flex items-center justify-center sidebar-transition ${
                     collapsed ? 'h-9 w-9' : 'h-10 w-10'
                   }`}>
-                    <User className={`text-sunset-500 sidebar-transition-all ${collapsed ? 'h-4 w-4' : 'h-5 w-5'}`} />
+                    <User className={`text-sunset-500 sidebar-transition ${collapsed ? 'h-4 w-4' : 'h-5 w-5'}`} />
                   </div>
                 )}
                 <div
-                  className="overflow-hidden sidebar-transition-all"
+                  className="overflow-hidden"
                   style={{
-                    maxWidth: collapsed ? 0 : '160px',
+                    maxWidth: collapsed ? '0px' : '160px',
                     opacity: collapsed ? 0 : 1,
                     transform: collapsed ? 'translateX(-6px)' : 'translateX(0)',
-                    transition: 'opacity 200ms ease-out, transform 250ms ease-out, max-width 300ms ease',
+                    transition: 'opacity 200ms ease-out 80ms, transform 280ms cubic-bezier(0.32, 0.72, 0, 1), max-width 320ms cubic-bezier(0.32, 0.72, 0, 1)',
                   }}
                 >
                   <p className="truncate text-sm font-medium text-ink-900 dark:text-paper-50">{userName}</p>
@@ -179,8 +176,8 @@ export function DashboardShell({
             </div>
 
             {/* Nav */}
-            <nav className="flex-1 overflow-y-auto overflow-x-hidden p-2 scrollbar-thin">
-              <ul className="space-y-0.5">
+            <nav className="flex-1 overflow-y-auto overflow-x-hidden scrollbar-thin sidebar-transition" style={{ padding: collapsed ? '0.5rem' : '0.5rem' }}>
+              <ul className="space-y-1">
                 {navItems.map(({ href, label, icon: Icon }) => {
                   const isActive = pathname === href || (href !== '/dashboard' && pathname.startsWith(href))
                   return (
@@ -188,34 +185,50 @@ export function DashboardShell({
                       <Link
                         href={href}
                         onClick={() => setSidebarOpen(false)}
-                        className={`relative flex items-center gap-3 rounded-lg text-sm sidebar-transition-all ${
+                        className={`relative flex items-center gap-3 rounded-lg text-sm sidebar-transition ${
                           collapsed ? 'justify-center px-2 py-2.5' : 'px-3 py-2'
                         } ${
                           isActive
                             ? 'bg-sunset-500/10 text-sunset-600 font-medium'
                             : 'text-ink-600 hover:bg-ink-100 hover:text-ink-900 dark:text-paper-200 dark:hover:bg-ink-800 dark:hover:text-paper-50'
                         }`}
+                        title={collapsed ? label : undefined}
                       >
                         {/* Active indicator bar */}
-                        {isActive && (
-                          <span className="absolute left-0 top-1/2 -translate-y-1/2 h-6 w-1 rounded-r-full bg-sunset-500 sidebar-transition-all" />
+                        {isActive && !collapsed && (
+                          <span
+                            className="absolute left-0 top-1/2 -translate-y-1/2 h-6 w-1 rounded-r-full bg-sunset-500"
+                            style={{
+                              animation: 'sidebar-content-in 320ms cubic-bezier(0.32, 0.72, 0, 1) both',
+                            }}
+                          />
                         )}
-                        <Icon className={`flex-shrink-0 sidebar-transition-all ${
-                          collapsed ? 'h-4 w-4' : 'h-4 w-4'
-                        } ${isActive ? 'scale-110' : ''}`} />
+                        <Icon
+                          className={`flex-shrink-0 sidebar-transition ${
+                            collapsed ? 'h-[18px] w-[18px]' : 'h-4 w-4'
+                          } ${isActive ? 'scale-110' : ''}`}
+                          style={{
+                            transition: 'transform 250ms cubic-bezier(0.32, 0.72, 0, 1), width 320ms ease, height 320ms ease',
+                          }}
+                        />
                         <span
                           className="overflow-hidden whitespace-nowrap"
                           style={{
-                            maxWidth: collapsed ? 0 : '160px',
+                            maxWidth: collapsed ? '0px' : '200px',
                             opacity: collapsed ? 0 : 1,
                             transform: collapsed ? 'translateX(-4px)' : 'translateX(0)',
-                            transition: 'opacity 200ms ease-out 100ms, transform 280ms cubic-bezier(0.32, 0.72, 0, 1), max-width 300ms ease',
+                            transition: 'opacity 200ms ease-out 80ms, transform 280ms cubic-bezier(0.32, 0.72, 0, 1), max-width 320ms cubic-bezier(0.32, 0.72, 0, 1)',
                           }}
                         >
                           {label}
                         </span>
                         {!collapsed && isActive && (
-                          <ChevronRight className="h-4 w-4 ml-auto animate-page-enter" />
+                          <ChevronRight
+                            className="h-4 w-4 ml-auto"
+                            style={{
+                              animation: 'sidebar-content-in 320ms cubic-bezier(0.32, 0.72, 0, 1) both',
+                            }}
+                          />
                         )}
                       </Link>
 
@@ -237,14 +250,11 @@ export function DashboardShell({
               <button
                 onClick={() => setCollapsed(!collapsed)}
                 aria-label={collapsed ? 'Expandir barra lateral' : 'Recolher barra lateral'}
-                className={`toggle-btn hidden lg:flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm text-ink-500 hover:bg-ink-100 hover:text-ink-700 sidebar-transition-all dark:text-paper-300 dark:hover:bg-ink-800 dark:hover:text-paper-100 ${
+                className={`toggle-btn hidden lg:flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm text-ink-500 hover:bg-ink-100 hover:text-ink-700 sidebar-transition dark:text-paper-300 dark:hover:bg-ink-800 dark:hover:text-paper-100 ${
                   collapsed ? 'justify-center' : ''
                 }`}
               >
-                <span
-                  className="flex items-center"
-                  key={collapsed ? 'open' : 'closed'}
-                >
+                <span className="flex items-center" key={collapsed ? 'open' : 'closed'}>
                   {collapsed ? (
                     <PanelLeftOpen className="h-4 w-4 icon-pivot" />
                   ) : (
@@ -254,10 +264,10 @@ export function DashboardShell({
                 <span
                   className="overflow-hidden whitespace-nowrap"
                   style={{
-                    maxWidth: collapsed ? 0 : '160px',
+                    maxWidth: collapsed ? '0px' : '200px',
                     opacity: collapsed ? 0 : 1,
                     transform: collapsed ? 'translateX(-4px)' : 'translateX(0)',
-                    transition: 'opacity 200ms ease-out 100ms, transform 280ms cubic-bezier(0.32, 0.72, 0, 1), max-width 300ms ease',
+                    transition: 'opacity 200ms ease-out 80ms, transform 280ms cubic-bezier(0.32, 0.72, 0, 1), max-width 320ms cubic-bezier(0.32, 0.72, 0, 1)',
                   }}
                 >
                   Recolher
@@ -267,7 +277,7 @@ export function DashboardShell({
               {/* Logout */}
               <button
                 onClick={handleLogout}
-                className={`mt-1 flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm text-red-500 hover:bg-red-50 sidebar-transition-all dark:hover:bg-red-500/10 ${
+                className={`mt-1 flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm text-red-500 hover:bg-red-50 sidebar-transition dark:hover:bg-red-500/10 ${
                   collapsed ? 'justify-center' : ''
                 }`}
               >
@@ -275,10 +285,10 @@ export function DashboardShell({
                 <span
                   className="overflow-hidden whitespace-nowrap"
                   style={{
-                    maxWidth: collapsed ? 0 : '160px',
+                    maxWidth: collapsed ? '0px' : '200px',
                     opacity: collapsed ? 0 : 1,
                     transform: collapsed ? 'translateX(-4px)' : 'translateX(0)',
-                    transition: 'opacity 200ms ease-out 100ms, transform 280ms cubic-bezier(0.32, 0.72, 0, 1), max-width 300ms ease',
+                    transition: 'opacity 200ms ease-out 80ms, transform 280ms cubic-bezier(0.32, 0.72, 0, 1), max-width 320ms cubic-bezier(0.32, 0.72, 0, 1)',
                   }}
                 >
                   Sair
@@ -297,7 +307,13 @@ export function DashboardShell({
         )}
 
         {/* Main content */}
-        <main className="flex-1 min-w-0 transition-all duration-300 ease-out">
+        <main
+          className="flex-1 min-w-0"
+          style={{
+            marginLeft: 0,
+            transition: 'padding-left 320ms cubic-bezier(0.32, 0.72, 0, 1)',
+          }}
+        >
           <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 max-w-6xl animate-page-enter">
             {children}
           </div>

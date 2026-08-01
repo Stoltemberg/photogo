@@ -3,6 +3,8 @@
 import { useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { User, Mail, Camera, MapPin, Phone, Loader2, Check, Building, Briefcase } from 'lucide-react'
+import { PageTransition } from '@/components/animations/PageTransition'
+
 
 export default function PerfilPage() {
   const supabase = createClient()
@@ -124,7 +126,7 @@ export default function PerfilPage() {
   }
 
   return (
-    <div className="space-y-6">
+    <PageTransition className="space-y-6">
       <div>
         <h1 className="font-mono text-2xl font-semibold text-ink-900 dark:text-paper-50">
           Perfil
@@ -316,6 +318,6 @@ export default function PerfilPage() {
           )}
         </button>
       </form>
-    </div>
+    </PageTransition>
   )
 }

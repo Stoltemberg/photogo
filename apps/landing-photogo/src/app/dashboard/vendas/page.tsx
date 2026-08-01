@@ -3,6 +3,8 @@
 import { useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { TrendingUp, DollarSign, Download, Loader2, Calendar } from 'lucide-react'
+import { PageTransition, StaggeredList } from '@/components/animations/PageTransition'
+import { AnimatedNumber } from '@/components/animations/AnimatedNumber'
 
 type Sale = {
   id: string
@@ -71,7 +73,7 @@ export default function VendasPage() {
   }
 
   return (
-    <div className="space-y-6">
+    <PageTransition className="space-y-6">
       <div>
         <h1 className="font-mono text-2xl font-semibold text-ink-900 dark:text-paper-50">
           Vendas
@@ -82,37 +84,37 @@ export default function VendasPage() {
       </div>
 
       {/* Summary cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <div className="rounded-2xl border border-ink-900/5 bg-paper-50 p-5 dark:border-paper-100/5 dark:bg-ink-900">
+      <StaggeredList className="grid grid-cols-1 sm:grid-cols-3 gap-4" delayStep={80}>
+        <div className="rounded-2xl border border-ink-900/5 bg-paper-50 p-5 hover-lift dark:border-paper-100/5 dark:bg-ink-900">
           <div className="flex items-center justify-between">
             <DollarSign className="h-5 w-5 text-green-500" />
             <span className="text-xs text-ink-500">Total recebido</span>
           </div>
           <p className="mt-3 text-2xl font-mono font-bold text-ink-900 dark:text-paper-50">
-            R$ {totalRevenue.toFixed(2).replace('.', ',')}
+            <AnimatedNumber value={totalRevenue} format={(n) => `R$ ${n.toFixed(2).replace('.', ',')}`} />
           </p>
         </div>
 
-        <div className="rounded-2xl border border-ink-900/5 bg-paper-50 p-5 dark:border-paper-100/5 dark:bg-ink-900">
+        <div className="rounded-2xl border border-ink-900/5 bg-paper-50 p-5 hover-lift dark:border-paper-100/5 dark:bg-ink-900">
           <div className="flex items-center justify-between">
             <TrendingUp className="h-5 w-5 text-yellow-500" />
             <span className="text-xs text-ink-500">Pendente</span>
           </div>
           <p className="mt-3 text-2xl font-mono font-bold text-ink-900 dark:text-paper-50">
-            R$ {pendingRevenue.toFixed(2).replace('.', ',')}
+            <AnimatedNumber value={pendingRevenue} format={(n) => `R$ ${n.toFixed(2).replace('.', ',')}`} />
           </p>
         </div>
 
-        <div className="rounded-2xl border border-ink-900/5 bg-paper-50 p-5 dark:border-paper-100/5 dark:bg-ink-900">
+        <div className="rounded-2xl border border-ink-900/5 bg-paper-50 p-5 hover-lift dark:border-paper-100/5 dark:bg-ink-900">
           <div className="flex items-center justify-between">
             <Calendar className="h-5 w-5 text-blue-500" />
             <span className="text-xs text-ink-500">Total de vendas</span>
           </div>
           <p className="mt-3 text-2xl font-mono font-bold text-ink-900 dark:text-paper-50">
-            {sales.length}
+            <AnimatedNumber value={sales.length} />
           </p>
         </div>
-      </div>
+      </StaggeredList>
 
       {/* Sales table */}
       {loading ? (
@@ -174,6 +176,6 @@ export default function VendasPage() {
           </table>
         </div>
       )}
-    </div>
+    </PageTransition>
   )
 }

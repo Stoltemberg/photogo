@@ -2,6 +2,8 @@
 
 import { useState } from 'react'
 import { ChevronDown, Mail, MessageCircle, HelpCircle, ExternalLink } from 'lucide-react'
+import { PageTransition, StaggeredList } from '@/components/animations/PageTransition'
+
 
 const faqs = [
   {
@@ -59,7 +61,7 @@ export default function AjudaPage() {
   ]
 
   return (
-    <div className="space-y-6">
+    <PageTransition className="space-y-6">
       <div>
         <h1 className="font-mono text-2xl font-semibold text-ink-900 dark:text-paper-50">
           Ajuda & Suporte
@@ -155,6 +157,6 @@ export default function AjudaPage() {
           </a>
         </div>
       </div>
-    </div>
+    </PageTransition>
   )
 }

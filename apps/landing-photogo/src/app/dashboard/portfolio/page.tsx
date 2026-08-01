@@ -24,6 +24,7 @@ import {
 } from 'lucide-react'
 import { AnimatedTabs } from '@/components/animations/AnimatedTabs'
 import { TabPanel } from '@/components/animations/TabPanel'
+import { PageTransition } from '@/components/animations/PageTransition'
 import { Modal } from '@/components/Modal'
 import { DropZone } from '@/components/DropZone'
 
@@ -224,7 +225,7 @@ export default function PortfolioPage() {
   const unfiledCount = photos.filter((p) => !photoAlbumMap[p.id]?.length).length
 
   return (
-    <div className="space-y-6">
+    <PageTransition className="space-y-6">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
           {selectedAlbum && (
@@ -550,7 +551,7 @@ export default function PortfolioPage() {
           onDelete={deleteAlbum}
         />
       )}
-    </div>
+    </PageTransition>
   )
 }
 
