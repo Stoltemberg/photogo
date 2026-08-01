@@ -96,6 +96,12 @@ export default function LoginPage() {
               </div>
             </div>
 
+            <div className="flex justify-end">
+              <Link href="/auth/recuperar-senha" className="text-xs text-sunset-500 hover:text-sunset-600 font-medium">
+                Esqueceu sua senha?
+              </Link>
+            </div>
+
             <button
               type="submit"
               disabled={status === 'loading'}
@@ -123,7 +129,7 @@ export default function LoginPage() {
 
           <p className="mt-6 text-center text-sm text-ink-600 dark:text-paper-200">
             Não tem conta?{' '}
-            <Link href="/auth/registrar" className="text-sunset-500 hover:text-sunset-600 font-medium">
+            <Link href="/auth/register" className="text-sunset-500 hover:text-sunset-600 font-medium">
               Criar conta
             </Link>
           </p>
