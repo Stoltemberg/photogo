@@ -1,0 +1,17 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": "nextjs",
+  "installCommand": "pnpm install --ignore-workspace --prod=false",
+  "buildCommand": "next build",
+  "outputDirectory": ".next",
+  "trailingSlash": false,
+  "git": {
+    "deploymentEnabled": {
+      "main": true,
+      "local/integration": true
+    }
+  },
+  "github": {
+    "silent": false
+  }
+}
