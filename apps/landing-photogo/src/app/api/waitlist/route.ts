@@ -1,5 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server'
 
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Methods': 'POST, OPTIONS',
+  'Access-Control-Allow-Headers': 'Content-Type',
+}
+
+const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
@@ -12,8 +20,6 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Basic email validation
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
     if (!emailRegex.test(email)) {
       return NextResponse.json(
         { error: 'Email inválido' },
@@ -21,14 +27,15 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // In a real implementation, this would:
-    // 1. Store in database (Vercel KV, PostgreSQL, etc.)
-    // 2. Send welcome email
-    // 3. Add to newsletter provider (Resend, SendGrid, etc.)
-    // For now, we'll just log and return success
-    
+    // In production, this stores in Supabase `waitlist` table
+    // and triggers a welcome email via Resend/SendGrid
     console.log('[Waitlist] New signup:', email)
-    
+
+    // TODO: Store in Supabase
+    // await supabaseAdmin.from('waitlist').insert({ email, created_at: new Date() })
+    // TODO: Send welcome email
+    // await resend.emails.send({ from: 'photo@photogo.com.br', to: email, subject: 'Bem-vindo!', ... })
+
     return NextResponse.json(
       { message: 'Inscrito com sucesso! Em breve entraremos em contato.', email },
       { status: 201, headers: corsHeaders }
@@ -42,16 +49,6 @@ export async function POST(request: NextRequest) {
   }
 }
 
-// Handle preflight OPTIONS request
 export async function OPTIONS() {
-  return new NextResponse(null, {
-    status: 204,
-    headers: corsHeaders
-  })
-}
-
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Methods': 'POST, OPTIONS',
-  'Access-Control-Allow-Headers': 'Content-Type',
+  return new NextResponse(null, { status: 204, headers: corsHeaders })
 }

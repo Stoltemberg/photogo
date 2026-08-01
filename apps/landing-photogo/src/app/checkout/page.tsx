@@ -4,28 +4,20 @@ import { Suspense, useEffect, useState } from 'react'
 import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import Image from 'next/image'
-import { ArrowLeft, CreditCard, QrCode, Loader2, Camera } from 'lucide-react'
+import { ArrowLeft, CreditCard, QrCode, Loader2, Camera, Trash2 } from 'lucide-react'
 
 type PhotoItem = {
   id: string
+  prefix_id: string
   src: string
   title: string
   price: number
   category: string
 }
 
-type CartItem = PhotoItem & { photographer: string }
+type CartItem = PhotoItem & { photographer_slug: string }
 
-const MOCK_PHOTOS: Record<string, PhotoItem> = {
-  p1: { id: 'p1', src: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&q=80', title: 'Montanha ao amanhecer', price: 49.90, category: 'Paisagem' },
-  p2: { id: 'p2', src: 'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=400&q=80', title: 'Floresta tropical', price: 59.90, category: 'Natureza' },
-  p3: { id: 'p3', src: 'https://images.unsplash.com/photo-1433086966358-54859d0ed716?w=400&q=80', title: 'Cachoeira', price: 39.90, category: 'Natureza' },
-  p4: { id: 'p4', src: 'https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=400&q=80', title: 'Pôr do sol na serra', price: 44.90, category: 'Paisagem' },
-  p5: { id: 'p5', src: 'https://images.unsplash.com/photo-1447752875215-b2761acb3c5d?w=400&q=80', title: 'Trilha na montanha', price: 34.90, category: 'Aventura' },
-  p6: { id: 'p6', src: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=400&q=80', title: 'Praia tropical', price: 54.90, category: 'Paisagem' },
-  p7: { id: 'p7', src: 'https://images.unsplash.com/photo-1519741497674-611481863552?w=400&q=80', title: 'Casamento ao ar livre', price: 89.90, category: 'Casamento' },
-  p8: { id: 'p8', src: 'https://images.unsplash.com/photo-1606216794074-735e91aa2c92?w=400&q=80', title: 'Retrato feminino', price: 69.90, category: 'Retrato' },
-}
+const CART_STORAGE_KEY = 'photogo_cart'
 
 export default function CheckoutPage() {
   return (
@@ -42,6 +34,7 @@ export default function CheckoutPage() {
 function CheckoutContent() {
   const searchParams = useSearchParams()
   const [items, setItems] = useState<CartItem[]>([])
+  const [loading, setLoading] = useState(true)
   const [email, setEmail] = useState('')
   const [paymentMethod, setPaymentMethod] = useState<'pix' | 'card'>('pix')
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle')
@@ -49,15 +42,41 @@ function CheckoutContent() {
   const [pixData, setPixData] = useState<{ qr_code: string; qr_code_base64: string } | null>(null)
 
   useEffect(() => {
-    const ids = searchParams.get('items')?.split(',') || []
-    const photographer = searchParams.get('photographer') || 'fotografo'
-    const cartItems = ids
-      .filter((id) => MOCK_PHOTOS[id])
-      .map((id) => ({ ...MOCK_PHOTOS[id], photographer }))
-    setItems(cartItems)
+    const photographer = searchParams.get('photographer') || ''
+    const photographerSlug = searchParams.get('slug') || photographer
+
+    // Load cart from localStorage (set by /fotografo/[slug])
+    try {
+      const raw = typeof window !== 'undefined' ? window.localStorage.getItem(CART_STORAGE_KEY) : null
+      if (raw) {
+        const cart = JSON.parse(raw) as Array<{ id: string; prefix_id: string; src: string; title: string; price: number; category: string; photographer_slug: string }>
+        const filtered = photographerSlug
+          ? cart.filter((item) => item.photographer_slug === photographerSlug)
+          : cart
+        setItems(filtered as CartItem[])
+      }
+    } catch {
+      // localStorage unavailable or invalid JSON
+    }
+    setLoading(false)
   }, [searchParams])
 
   const total = items.reduce((sum, item) => sum + item.price, 0)
+
+  const removeItem = (id: string) => {
+    const newItems = items.filter((i) => i.id !== id)
+    setItems(newItems)
+    try {
+      const raw = window.localStorage.getItem(CART_STORAGE_KEY)
+      if (raw) {
+        const cart = JSON.parse(raw)
+        const newCart = cart.filter((c: { id: string }) => c.id !== id)
+        window.localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(newCart))
+      }
+    } catch {
+      // ignore
+    }
+  }
 
   const handleCheckout = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -72,7 +91,7 @@ function CheckoutContent() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           email,
-          items: items.map((i) => ({ product_id: i.id, quantity: 1 })),
+          items: items.map((i) => ({ product_id: i.prefix_id || i.id, quantity: 1 })),
           payment_method: 'mercado_pago',
           payment_data: { method: paymentMethod },
         }),
@@ -87,7 +106,9 @@ function CheckoutContent() {
           setMessage('Pagamento Pix gerado! Escaneie o QR code abaixo.')
         } else {
           setStatus('success')
-          setMessage('Pedido realizado com sucesso!')
+          setMessage('Pedido realizado com sucesso! Verifique seu email para o link de download.')
+          // Clear cart on success
+          try { window.localStorage.removeItem(CART_STORAGE_KEY) } catch {}
         }
       } else {
         setStatus('error')
@@ -97,6 +118,14 @@ function CheckoutContent() {
       setStatus('error')
       setMessage('Erro de conexão. Tente novamente.')
     }
+  }
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin text-sunset-500" />
+      </div>
+    )
   }
 
   if (items.length === 0) {
@@ -137,6 +166,13 @@ function CheckoutContent() {
               <span className="font-mono font-semibold text-sunset-500">
                 R$ {item.price.toFixed(2).replace('.', ',')}
               </span>
+              <button
+                onClick={() => removeItem(item.id)}
+                className="p-2 text-ink-400 hover:text-red-500 transition"
+                aria-label="Remover do carrinho"
+              >
+                <Trash2 className="h-4 w-4" />
+              </button>
             </div>
           ))}
         </div>

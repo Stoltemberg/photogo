@@ -18,56 +18,44 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // In production, this would call the Spree backend API:
-    // const res = await fetch(`${process.env.SPREE_API_URL}/api/v3/store/checkout`, { ... })
+    const spreeUrl = process.env.SPREE_API_URL
+    const spreeKey = process.env.SPREE_API_KEY
 
-    // For now, simulate a successful checkout
-    const orderId = `ord_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`
-    const total = items.length * 49.90 // simplified
-
-    if (payment_data?.method === 'pix') {
-      return NextResponse.json({
-        order_id: orderId,
-        status: 'pending_payment',
-        total,
-        payment: {
-          method: 'pix',
-          status: 'pending',
-          qr_code: '00020126360014BR.GOV.BCB.PIX0114test@photogo.com.br5204000053039865802BR5913PHOTOGO',
-          qr_code_base64: 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==',
-          ticket_url: 'https://www.mercadopago.com.br/checkout/v1/redirect',
-          expires_at: new Date(Date.now() + 30 * 60 * 1000).toISOString(),
-        },
-        commissions: items.map((_: unknown, i: number) => ({
-          id: `comm_${i}_${Date.now()}`,
-          vendor_id: `vnd_${i}`,
-          amount_cents: Math.round(49.90 * 100 * 0.85),
-          currency: 'BRL',
-          status: 'pending',
-        })),
-      }, { status: 201, headers: corsHeaders })
+    if (!spreeUrl || !spreeKey) {
+      return NextResponse.json(
+        { error: 'Backend não configurado' },
+        { status: 503, headers: corsHeaders }
+      )
     }
 
-    // Card payment (simulated approval)
-    return NextResponse.json({
-      order_id: orderId,
-      status: 'complete',
-      total,
-      payment: {
-        method: 'card',
-        status: 'approved',
-        payment_method_id: payment_data?.payment_method_id || 'visa',
-        installments: payment_data?.installments || 1,
+    // Forward checkout to Spree backend
+    const res = await fetch(`${spreeUrl}/api/v3/store/checkout`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${spreeKey}`,
       },
-      commissions: items.map((_: unknown, i: number) => ({
-        id: `comm_${i}_${Date.now()}`,
-        vendor_id: `vnd_${i}`,
-        amount_cents: Math.round(49.90 * 100 * 0.85),
-        currency: 'BRL',
-        status: 'pending',
-      })),
-    }, { status: 201, headers: corsHeaders })
+      body: JSON.stringify({
+        email,
+        items: items.map((i: { product_id: string; quantity: number }) => ({
+          product_id: i.product_id,
+          quantity: i.quantity,
+        })),
+        payment_method,
+        payment_data,
+      }),
+    })
 
+    const data = await res.json()
+
+    if (!res.ok) {
+      return NextResponse.json(
+        { error: data.error || 'Erro ao processar pagamento' },
+        { status: res.status, headers: corsHeaders }
+      )
+    }
+
+    return NextResponse.json(data, { status: 201, headers: corsHeaders })
   } catch (error) {
     console.error('[Checkout] Error:', error)
     return NextResponse.json(
