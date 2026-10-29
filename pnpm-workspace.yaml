@@ -1,5 +1,6 @@
 packages:
   - "packages/*"
+  - "apps/*"
 
 # Supply-chain hardening — see https://pnpm.io/supply-chain-security
 #

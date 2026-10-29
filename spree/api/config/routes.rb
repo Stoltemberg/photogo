@@ -102,6 +102,18 @@ Spree::Core::Engine.add_routes do
 
         # Data Feeds (public, no auth required)
         resources :feeds, only: [:show], controller: 'data_feeds', param: :slug
+
+        # Vendors (public profiles — approved only, no auth)
+        resources :vendors, only: [:index, :show], param: :slug, controller: 'vendors'
+
+        # Vendor Applications (self-serve "become a seller", no auth, rate-limited)
+        resources :vendor_applications, only: [:create], controller: 'vendors'
+
+        # Photographers (public profiles with photo-specific data)
+        resources :photographers, only: [:index, :show], param: :slug, controller: 'photographers'
+
+        # Store checkout endpoint (creates order, generates commissions)
+        post 'checkout', to: 'checkout#create', as: :checkout
       end
 
       namespace :admin do
@@ -391,11 +403,51 @@ Spree::Core::Engine.add_routes do
           resources :gift_cards, controller: 'orders/gift_cards', only: [:create, :destroy]
           resource :store_credits, controller: 'orders/store_credits', only: [:create, :destroy]
         end
+
+        # Vendors (photographers / marketplace sellers)
+        resources :vendors, only: [:index, :show, :create, :update, :destroy] do
+          member do
+            post :approve
+            post :reject
+            post :suspend
+          end
+          collection do
+            get :payouts
+            get :transfers
+          end
+        end
+
+        # Photographers (photo-specific profiles extending vendors)
+        resources :photographers, only: [:index, :show, :update] do
+          member do
+            post :verify
+            post :feature
+          end
+        end
+
+        # Photo Licenses (admin management)
+        resources :licenses, only: [:index, :show, :create, :update] do
+          member do
+            post :issue_certificate
+            post :revoke
+          end
+        end
+
+        # Photo Payouts (admin management)
+        resources :payouts, only: [:index, :show] do
+          member do
+            post :process
+            post :mark_paid
+            post :mark_failed
+          end
+        end
       end
 
       # Webhooks (outside of store namespace — no API key authentication)
       namespace :webhooks do
         post 'payments/:payment_method_id', to: 'payments#create', as: :payment_webhook
+        post 'mercado_pago',               to: 'mercado_pago#create', as: :mercado_pago_webhook
+        post 'supabase',                   to: 'supabase#create', as: :supabase_webhook
       end
     end
   end

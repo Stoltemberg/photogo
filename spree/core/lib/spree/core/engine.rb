@@ -441,6 +441,22 @@ module Spree
           Rails.configuration.cache_classes ? require(c) : load(c)
         end
 
+        # Load VendorConcern so core models can include it via
+        # `if defined?(Spree::VendorConcern)` hooks.
+        Spree::VendorConcern # touch autoload path
+
+        # ────── PhotoGo: Photo domain extensions ──────
+        # Include PhotoProduct concern into Spree::Product (adds product_type
+        # enum, EXIF store_accessor, GPS, release flags).
+        Spree::Product.include(Spree::Product::PhotoProduct) unless Spree::Product.include?(Spree::Product::PhotoProduct)
+
+        # Wire Vendor → PhotographerProfile association (one-to-one).
+        Spree::Vendor.has_one :photographer_profile,
+          class_name: 'Photo::PhotographerProfile',
+          dependent: :destroy,
+          inverse_of: :vendor
+        # ─────────────────────────────────────────────
+
         # Reset and re-activate event subscribers on code reload
         # activate! will register all subscribers from Spree.subscribers
         # Note: resolve_subscriber in register_subscribers! handles stale class references
